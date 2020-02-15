@@ -46,17 +46,16 @@ class MainViewModel : ViewModel() {
                               year: Int = Calendar.getInstance().get(Calendar.YEAR),
                               sortBy: Int = 0): LiveData<ArrayList<Movie>> {
         var result: Call<MovieResponse>? = null
-        var sort = "popularity.desc"
-
-        when (sortBy) {
-            0 -> sort = "popularity.desc"
-            1 -> sort = "popularity.asc"
-            2 -> sort = "vote_average.desc"
-            3 -> sort = "vote_average.asc"
-            4 -> sort = "release_date.desc"
-            5 -> sort = "release_date.asc"
-            6 -> sort = "original_title.desc"
-            7 -> sort = "original_title.asc"
+        val sort = when (sortBy) {
+            0 -> "popularity.desc"
+            1 -> "popularity.asc"
+            2 -> "vote_average.desc"
+            3 -> "vote_average.asc"
+            4 -> "release_date.desc"
+            5 -> "release_date.asc"
+            6 -> "original_title.desc"
+            7 -> "original_title.asc"
+            else -> "popularity.desc"
         }
 
         when (index) {
@@ -85,15 +84,14 @@ class MainViewModel : ViewModel() {
                            year: Int = Calendar.getInstance().get(Calendar.YEAR),
                            sortBy: Int = 0): LiveData<ArrayList<TVShow>> {
         var result: Call<TVShowResponse>? = null
-        var sort = "popularity.desc"
-
-        when (sortBy) {
-            0 -> sort = "popularity.desc"
-            1 -> sort = "popularity.asc"
-            2 -> sort = "vote_average.desc"
-            3 -> sort = "vote_average.asc"
-            4 -> sort = "first_air_date.desc"
-            5 -> sort = "first_air_date.asc"
+        val sort = when (sortBy) {
+            0 -> "popularity.desc"
+            1 -> "popularity.asc"
+            2 -> "vote_average.desc"
+            3 -> "vote_average.asc"
+            4 -> "first_air_date.desc"
+            5 -> "first_air_date.asc"
+            else -> "popularity.desc"
         }
 
         when (index) {

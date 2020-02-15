@@ -2,6 +2,7 @@ package com.nf98.moviecatalogue
 
 import com.nf98.moviecatalogue.response.MovieResponse
 import com.nf98.moviecatalogue.response.TVShowResponse
+import com.nf98.moviecatalogue.viewmodel.MainViewModel
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -9,7 +10,7 @@ import java.time.Year
 
 interface ApiServices {
 
-    @GET("movie/now_playing?api_key=f1fb599be2a8084210ab493502e6c728&language=en-US&page=1")
+    @GET("movie/now_playing?api_key=${MainViewModel.API_KEY}&language=en-US&page=1")
     fun getNowPlayingMovies(): Call<MovieResponse>
 
     @GET("movie/popular?api_key=f1fb599be2a8084210ab493502e6c728&language=en-US&page=1")

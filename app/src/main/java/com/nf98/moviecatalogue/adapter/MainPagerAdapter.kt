@@ -1,7 +1,6 @@
 package com.nf98.moviecatalogue.adapter
 
 import android.content.Context
-import androidx.annotation.Nullable
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -20,7 +19,6 @@ class MainPagerAdapter(private val context: Context?, fm: FragmentManager, priva
 
     @StringRes
     private var TITLES = intArrayOf()
-    private var fragmentList = arrayListOf<Fragment>()
 
     init {
         when(type) {
@@ -31,14 +29,12 @@ class MainPagerAdapter(private val context: Context?, fm: FragmentManager, priva
     }
 
     override fun getItem(position: Int): Fragment {
-        var fragment: Fragment? = null
-        when(type) {
-            TYPE_MOVIE -> fragment = ListFragment.newInstance(position)
-            TYPE_TV -> fragment = ListFragment.newInstance(position + 4)
-            TYPE_DISCOVER -> fragment = ListFragment.newInstance(position + 8)
+        return when(type) {
+            TYPE_MOVIE -> ListFragment.newInstance(position)
+            TYPE_TV -> ListFragment.newInstance(position + 4)
+            TYPE_DISCOVER -> ListFragment.newInstance(position + 8)
+            else -> throw IllegalArgumentException("Invalid view type")
         }
-
-        return fragment as Fragment
     }
 
     override fun getPageTitle(position: Int): CharSequence? {

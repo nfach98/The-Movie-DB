@@ -1,7 +1,7 @@
 <resources>
     <string name="movies">Film</string>
     <string name="tv_shows">Acara TV</string>
-    <string name="discover">Cari</string>
+    <string name="discover">Temukan</string>
 
     <string name="year">Tahun</string>
     <string name="sort_by">Urut berdasarkan</string>
@@ -33,13 +33,13 @@
     <string name="crew">Kru</string>
     <string name="fact">Fakta</string>
 
-    <string name="pop_desc">Popularitas ↑</string>
-    <string name="pop_asc">Popularitas ↓</string>
-    <string name="score_desc">Nilai ↑</string>
-    <string name="score_asc">Nilai ↓</string>
-    <string name="rel_date_desc">Tanggal Rilis ↑</string>
-    <string name="rel_date_asc">Tanggal Rilis ↓</string>
-    <string name="title_desc">Judul ↑</string>
-    <string name="title_asc">Judul ↓</string>
+    <string name="pop_desc">Popularitas ↓</string>
+    <string name="pop_asc">Popularitas ↑</string>
+    <string name="score_desc">Nilai ↓</string>
+    <string name="score_asc">Nilai ↑</string>
+    <string name="rel_date_desc">Tanggal Rilis ↓</string>
+    <string name="rel_date_asc">Tanggal Rilis ↑</string>
+    <string name="title_desc">Judul ↓</string>
+    <string name="title_asc">Judul ↑</string>
 
 </resources>

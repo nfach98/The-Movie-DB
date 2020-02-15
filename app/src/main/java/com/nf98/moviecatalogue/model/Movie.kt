@@ -58,4 +58,5 @@ data class Movie(
 
     @SerializedName("release_date")
     @Expose
-    var releaseDate: String? = null )
+    var releaseDate: String? = null
+)

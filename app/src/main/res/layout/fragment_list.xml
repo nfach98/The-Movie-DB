@@ -3,13 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.ListFragment">
 
     <TableLayout
         android:id="@+id/tableDisc"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:elevation="4dp">
 
         <TableRow
             android:layout_width="match_parent"
@@ -44,28 +45,31 @@
             android:layout_marginBottom="12dp"
             android:weightSum="2">
 
-            <Spinner
-                android:id="@+id/spinnerYear"
+            <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="10dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:background="@drawable/back_spinner"
-                android:dropDownSelector="@color/colorAccent"/>
+                android:layout_marginEnd="10dp">
 
-            <Spinner
-                android:id="@+id/spinnerSort"
+                <Spinner
+                    android:id="@+id/spinnerYear"
+                    style="@style/SpinnerTheme"
+                    tools:entries="@array/sort_by_movie" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="10dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                android:background="@drawable/back_spinner"
-                android:dropDownSelector="@color/colorAccent"
-                android:entries="@array/sort_by_movie" />
+                android:layout_marginStart="10dp">
+
+                <Spinner
+                    android:id="@+id/spinnerSort"
+                    style="@style/SpinnerTheme"
+                    tools:entries="@array/sort_by_movie" />
+
+            </RelativeLayout>
 
         </TableRow>
 
