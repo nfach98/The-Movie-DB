@@ -1,0 +1,45 @@
+<resources>
+    <string name="movies">Film</string>
+    <string name="tv_shows">Acara TV</string>
+    <string name="discover">Cari</string>
+
+    <string name="year">Tahun</string>
+    <string name="sort_by">Urut berdasarkan</string>
+
+    <string name="setting">Pengaturan</string>
+
+    <string name="score">Nilai</string>
+    <string name="language">Bahasa</string>
+    <string name="run_year">Tahun Tayang</string>
+    <string name="season">Musim</string>
+    <string name="top_cast">Pemeran Unggulan</string>
+    <string name="feat_crew">Kru Unggulan</string>
+    <string name="current_season">Musim Terakhir</string>
+
+    <string name="movie_poster">Poster film</string>
+    <string name="full_cast">Semua Pemeran</string>
+    <string name="full_crew">Semua Kru</string>
+    <string name="all_seasons">Semua Musim</string>
+
+    <string name="popular">Populer</string>
+    <string name="top_rated">Nilai Teratas</string>
+    <string name="upcoming">Segera</string>
+    <string name="now_playing">Diputar Sekarang</string>
+    <string name="on_tv">Sedang Tayang</string>
+    <string name="airing_today">Tayang Hari Ini</string>
+
+    <string name="summary">Ringkasan</string>
+    <string name="cast">Pemeran</string>
+    <string name="crew">Kru</string>
+    <string name="fact">Fakta</string>
+
+    <string name="pop_desc">Popularitas ↑</string>
+    <string name="pop_asc">Popularitas ↓</string>
+    <string name="score_desc">Nilai ↑</string>
+    <string name="score_asc">Nilai ↓</string>
+    <string name="rel_date_desc">Tanggal Rilis ↑</string>
+    <string name="rel_date_asc">Tanggal Rilis ↓</string>
+    <string name="title_desc">Judul ↑</string>
+    <string name="title_asc">Judul ↓</string>
+
+</resources>

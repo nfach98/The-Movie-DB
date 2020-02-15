@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_main.xml"
+    app:startDestination="@id/nav_discover">
+
+    <fragment
+        android:id="@+id/nav_discover"
+        android:name="com.nf98.moviecatalogue.ui.main.DiscoverFragment"
+        android:label="fragment_discover"
+        tools:layout="@layout/fragment_main_discover" >
+        <action
+            android:id="@+id/action_nav_discover_to_detailActivity"
+            app:destination="@id/detailActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_movie"
+        android:name="com.nf98.moviecatalogue.ui.main.MovieFragment"
+        android:label="MovieFragment"
+        tools:layout="@layout/fragment_main_movie" >
+        <action
+            android:id="@+id/action_nav_movie_to_detailActivity"
+            app:destination="@id/detailActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_tv_show"
+        android:name="com.nf98.moviecatalogue.ui.main.TVShowFragment"
+        android:label="fragment_tvshow"
+        tools:layout="@layout/fragment_main_tvshow" >
+        <action
+            android:id="@+id/action_nav_tv_show_to_detailActivity"
+            app:destination="@id/detailActivity" />
+    </fragment>
+    <activity
+        android:id="@+id/detailActivity"
+        android:name="com.nf98.moviecatalogue.ui.detail.DetailActivity"
+        android:label="DetailActivity" >
+        <argument
+            android:name="id"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
+
+</navigation>

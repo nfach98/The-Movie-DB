@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:paddingTop="12dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp">
+
+    <ImageView
+        android:id="@+id/iv_poster"
+        android:layout_width="120dp"
+        android:layout_height="180dp"
+        android:scaleType="fitXY"
+        android:contentDescription="@string/movie_poster"
+        tools:src="@android:color/holo_green_dark" />
+
+    <com.github.lzyzsd.circleprogress.DonutProgress
+        android:id="@+id/donut_score"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_toEndOf="@id/iv_poster"
+        android:layout_marginStart="12dp"
+        app:donut_background_color="@android:color/black"
+        app:donut_unfinished_color="#333333"
+        app:donut_unfinished_stroke_width="4dp"
+        app:donut_finished_stroke_width="5dp"
+        app:donut_circle_starting_degree="270"
+        app:donut_text_size="16sp"
+        app:donut_text_color="@android:color/white" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="match_parent"
+        android:layout_toEndOf="@id/donut_score"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="0dp"
+        style="@style/TextDetail.Title"
+        android:textColor="@android:color/black"
+        android:maxLines="3"
+        android:ellipsize="end"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit."/>
+
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="0dp"
+        style="@style/TextDetail.Content"
+        android:layout_below="@id/tv_name"
+        android:layout_toEndOf="@id/donut_score"
+        android:textColor="@android:color/black"
+        tools:text="Date"/>
+
+    <TextView
+        android:id="@+id/tv_desc"
+        style="@style/TextDetail.Content"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/tv_date"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="0dp"
+        android:layout_toEndOf="@id/iv_poster"
+        android:ellipsize="end"
+        android:maxLines="5"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eu molestie enim. Duis congue metus eget nunc sagittis, ut congue leo consectetur. Proin maximus lacus ac convallis vestibulum. Aenean hendrerit neque non neque dapibus vulputate. Sed eu ullamcorper ipsum. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam erat volutpat. Phasellus et consequat turpis. Fusce eu tellus convallis, rhoncus augue quis, viverra nulla. Vestibulum suscipit sapien eget turpis hendrerit varius. " />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/iv_poster"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="0dp"
+        android:background="@android:color/darker_gray"/>
+
+</RelativeLayout>

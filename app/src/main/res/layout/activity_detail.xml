@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.detail.DetailActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white">
+
+        <ImageView
+            android:id="@+id/backPoster"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@android:color/holo_blue_bright"/>
+
+        <View
+            android:id="@+id/backColor"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintTop_toBottomOf="@id/backPoster"/>
+
+        <ImageView
+            android:id="@+id/poster"
+            android:layout_width="100dp"
+            android:layout_height="150dp"
+            android:scaleType="fitXY"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@android:color/holo_green_dark" />
+
+        <TextView
+            android:id="@+id/name"
+            style="@style/TextDetail.Title"
+            android:layout_toEndOf="@id/poster"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/poster"
+            app:layout_constraintTop_toTopOf="@id/backColor"
+            tools:text="Movie" />
+
+        <TextView
+            android:id="@+id/date"
+            style="@style/TextDetail.Content"
+            android:layout_toEndOf="@id/poster"
+            android:textColor="@android:color/white"
+            android:maxLines="1"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintStart_toEndOf="@id/poster"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/name"
+            tools:text="Date" />
+
+        <TextView
+            android:id="@+id/tvScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/score"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toEndOf="@id/score"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/date"
+            app:layout_constraintBottom_toBottomOf="@id/backColor"/>
+
+        <com.github.lzyzsd.circleprogress.DonutProgress
+            android:id="@+id/score"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:donut_background_color="@android:color/black"
+            app:donut_circle_starting_degree="270"
+            app:donut_finished_stroke_width="8dp"
+            app:donut_text_color="@android:color/white"
+            app:donut_text_size="20sp"
+            app:donut_unfinished_color="#333333"
+            app:donut_unfinished_stroke_width="6dp"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tvScore"
+            app:layout_constraintTop_toBottomOf="@id/date"
+            app:layout_constraintBottom_toBottomOf="@id/backColor" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabDetail"
+            android:layout_width="wrap_content"
+            style="@style/InnerTabTheme"
+            app:tabMode="scrollable"
+            android:scrollbars="none"
+            app:layout_constraintTop_toBottomOf="@id/backColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <viewpagerwc.ui.dom.wrapping.WrappingViewPager
+            android:id="@+id/pagerDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tabDetail" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
+

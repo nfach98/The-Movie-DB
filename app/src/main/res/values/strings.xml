@@ -1,0 +1,69 @@
+<resources>
+    <string name="app_name" translatable="false">Movie Catalogue</string>
+
+    <string name="setting">Setting</string>
+
+    <string name="movies">Movies</string>
+    <string name="tv_shows">TV Shows</string>
+    <string name="discover">Discover</string>
+
+    <string name="year">Year</string>
+    <string name="sort_by">Sort by</string>
+
+    <string name="score">Score</string>
+    <string name="genre" translatable="false">Genre</string>
+    <string name="language">Language</string>
+    <string name="run_year">Running Year</string>
+    <string name="season">Season</string>
+    <string name="top_cast">Top Billed Cast</string>
+    <string name="feat_crew">Featured Crew</string>
+    <string name="current_season">Current Season</string>
+
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="movie_poster">Movie poster</string>
+    <string name="all_seasons">All Seasons</string>
+    <string name="full_crew">Full Crew</string>
+    <string name="full_cast">Full Cast</string>
+
+    <string name="popular">Popular</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="on_tv">On TV</string>
+    <string name="airing_today">Airing Today</string>
+
+    <string name="summary">Summary</string>
+    <string name="cast">Cast</string>
+    <string name="crew">Crew</string>
+    <string name="fact">Fact</string>
+
+    <string name="pop_desc">Popularity ↓</string>
+    <string name="pop_asc">Popularity ↑</string>
+    <string name="score_desc">Score ↓</string>
+    <string name="score_asc">Score ↑</string>
+    <string name="rel_date_desc">Release Date ↓</string>
+    <string name="rel_date_asc">Release Date ↑</string>
+    <string name="title_desc">Title ↓</string>
+    <string name="title_asc">Title ↑</string>
+
+    <string-array name="sort_by_movie">
+        <item>@string/pop_desc</item>
+        <item>@string/pop_asc</item>
+        <item>@string/score_desc</item>
+        <item>@string/score_asc</item>
+        <item>@string/rel_date_desc</item>
+        <item>@string/rel_date_asc</item>
+        <item>@string/title_desc</item>
+        <item>@string/title_asc</item>
+    </string-array>
+
+    <string-array name="sort_by_tv">
+        <item>@string/pop_desc</item>
+        <item>@string/pop_asc</item>
+        <item>@string/score_desc</item>
+        <item>@string/score_asc</item>
+        <item>@string/rel_date_desc</item>
+        <item>@string/rel_date_asc</item>
+    </string-array>
+    
+</resources>

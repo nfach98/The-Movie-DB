@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#081c24</color>
+    <color name="colorPrimaryDark">#041218</color>
+    <color name="colorAccent">#01d277</color>
+
+    <color name="donutGreen">#11de02</color>
+    <color name="donutLime">#6aff00</color>
+    <color name="donutYellow">#fcd303</color>
+    <color name="donutOrange">#ff7700</color>
+    <color name="donutRed">#e00b0b</color>
+</resources>
