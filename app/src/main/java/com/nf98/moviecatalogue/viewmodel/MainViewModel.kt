@@ -1,28 +1,27 @@
 package com.nf98.moviecatalogue.viewmodel
 
+import android.annotation.SuppressLint
 import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nf98.moviecatalogue.ApiMain
-import com.nf98.moviecatalogue.response.MovieResponse
 import com.nf98.moviecatalogue.model.Movie
 import com.nf98.moviecatalogue.model.TVShow
+import com.nf98.moviecatalogue.response.MovieResponse
 import com.nf98.moviecatalogue.response.TVShowResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.time.Year
 import java.util.*
-import kotlin.collections.ArrayList
 
 class MainViewModel : ViewModel() {
 
     companion object {
         const val API_KEY = "f1fb599be2a8084210ab493502e6c728"
-        const val language = "en-US"
-        const val page = 1
+
+        @SuppressLint("ConstantLocale")
+        val region: String = Locale.getDefault().country
 
         const val MOVIE_POPULAR = 0
         const val MOVIE_TOP_RATED = 1
@@ -45,7 +44,6 @@ class MainViewModel : ViewModel() {
     internal fun getMovieList(index: Int,
                               year: Int = Calendar.getInstance().get(Calendar.YEAR),
                               sortBy: Int = 0): LiveData<ArrayList<Movie>> {
-        var result: Call<MovieResponse>? = null
         val sort = when (sortBy) {
             0 -> "popularity.desc"
             1 -> "popularity.asc"
@@ -58,16 +56,16 @@ class MainViewModel : ViewModel() {
             else -> "popularity.desc"
         }
 
-        when (index) {
-            MOVIE_POPULAR -> result = ApiMain().services.getPopularMovies()
-            MOVIE_TOP_RATED -> result = ApiMain().services.getTopRatedMovies()
-            MOVIE_UPCOMING -> result = ApiMain().services.getUpcomingMovies()
-            MOVIE_NOW_PLAYING -> result = ApiMain().services.getNowPlayingMovies()
-
-            MOVIE_DISCOVER -> result = ApiMain().services.getDiscoverMovie(year, sort)
+        val result = when (index) {
+            MOVIE_POPULAR -> ApiMain().services.getPopularMovies(region)
+            MOVIE_TOP_RATED -> ApiMain().services.getTopRatedMovies(region)
+            MOVIE_UPCOMING -> ApiMain().services.getUpcomingMovies(region)
+            MOVIE_NOW_PLAYING -> ApiMain().services.getNowPlayingMovies(region)
+            MOVIE_DISCOVER -> ApiMain().services.getDiscoverMovie(region, year, sort)
+            else -> throw IllegalArgumentException("Invalid type")
         }
 
-        result?.enqueue(object : Callback<MovieResponse> {
+        result.enqueue(object : Callback<MovieResponse> {
             override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                 if(response.code() == 200)
                     response.body()?.movies.let { listMovie.postValue(it) }
@@ -83,7 +81,6 @@ class MainViewModel : ViewModel() {
     internal fun getTVList(index: Int,
                            year: Int = Calendar.getInstance().get(Calendar.YEAR),
                            sortBy: Int = 0): LiveData<ArrayList<TVShow>> {
-        var result: Call<TVShowResponse>? = null
         val sort = when (sortBy) {
             0 -> "popularity.desc"
             1 -> "popularity.asc"
@@ -94,16 +91,16 @@ class MainViewModel : ViewModel() {
             else -> "popularity.desc"
         }
 
-        when (index) {
-            TV_POPULAR -> result = ApiMain().services.getPopularTV()
-            TV_TOP_RATED -> result = ApiMain().services.getTopRatedTV()
-            TV_ON_TV -> result = ApiMain().services.getOnTheAirTV()
-            TV_AIRING_TODAY -> result = ApiMain().services.getAiringTodayTV()
-
-            TV_DISCOVER -> result = ApiMain().services.getDiscoverTV(year, sort)
+        val result = when (index) {
+            TV_POPULAR -> ApiMain().services.getPopularTV()
+            TV_TOP_RATED -> ApiMain().services.getTopRatedTV()
+            TV_ON_TV -> ApiMain().services.getOnTheAirTV()
+            TV_AIRING_TODAY -> ApiMain().services.getAiringTodayTV()
+            TV_DISCOVER -> ApiMain().services.getDiscoverTV(year, sort)
+            else -> throw IllegalArgumentException("Invalid type")
         }
 
-        result?.enqueue(object : Callback<TVShowResponse> {
+        result.enqueue(object : Callback<TVShowResponse> {
             override fun onResponse(call: Call<TVShowResponse>, response: Response<TVShowResponse>) {
                 if(response.code() == 200)
                     response.body()?.tvShows.let { listTVShow.postValue(it) }

@@ -73,7 +73,7 @@ class ListAdapter: RecyclerView.Adapter<ItemViewHolder<*>>() {
                         .load("https://image.tmdb.org/t/p/w154${item.posterPath}")
                         .into(iv_poster)
 
-                    tv_name.text = item.title
+                    tv_name.text = item.originalTitle
                     tv_desc.text = item.overview
                     item.releaseDate?.let { setDate(it) }
                     setDonut(item.score)

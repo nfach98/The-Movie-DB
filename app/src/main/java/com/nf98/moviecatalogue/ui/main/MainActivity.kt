@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
