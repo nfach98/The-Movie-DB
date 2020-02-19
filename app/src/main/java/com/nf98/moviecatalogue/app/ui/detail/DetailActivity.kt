@@ -55,7 +55,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun style(){
-        when (movie.score){
+        when (movie.score.times(10).toInt()){
             in Int.MIN_VALUE..39 -> score.finishedStrokeColor = ContextCompat.getColor(this, R.color.donutRed)
             in 40..59 -> score.finishedStrokeColor = ContextCompat.getColor(this, R.color.donutOrange)
             in 60..69 -> score.finishedStrokeColor = ContextCompat.getColor(this, R.color.donutYellow)
