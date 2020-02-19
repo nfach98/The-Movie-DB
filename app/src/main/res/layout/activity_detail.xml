@@ -15,14 +15,15 @@
         <ImageView
             android:id="@+id/backPoster"
             android:layout_width="match_parent"
-            android:layout_height="90dp"
+            android:layout_height="140dp"
+            android:scaleType="center"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@android:color/holo_blue_bright"/>
 
         <View
             android:id="@+id/backColor"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
+            android:layout_height="200dp"
             android:background="@color/colorPrimary"
             app:layout_constraintTop_toBottomOf="@id/backPoster"/>
 
@@ -32,9 +33,9 @@
             android:layout_height="150dp"
             android:scaleType="fitXY"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginBottom="90dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/backColor"
             tools:src="@android:color/holo_green_dark" />
 
         <TextView
@@ -75,7 +76,7 @@
             android:layout_marginStart="8dp"
             app:layout_constraintStart_toEndOf="@id/score"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/date"
+            app:layout_constraintTop_toBottomOf="@id/poster"
             app:layout_constraintBottom_toBottomOf="@id/backColor"/>
 
         <com.github.lzyzsd.circleprogress.DonutProgress
@@ -92,7 +93,7 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tvScore"
-            app:layout_constraintTop_toBottomOf="@id/date"
+            app:layout_constraintTop_toBottomOf="@id/poster"
             app:layout_constraintBottom_toBottomOf="@id/backColor" />
 
         <com.google.android.material.tabs.TabLayout
