@@ -1,15 +1,15 @@
-package com.nf98.moviecatalogue.viewmodel
+package com.nf98.moviecatalogue.app.viewmodel
 
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.nf98.moviecatalogue.ApiMain
-import com.nf98.moviecatalogue.model.Movie
-import com.nf98.moviecatalogue.model.TVShow
-import com.nf98.moviecatalogue.response.MovieResponse
-import com.nf98.moviecatalogue.response.TVShowResponse
+import com.nf98.moviecatalogue.api.ApiMain
+import com.nf98.moviecatalogue.api.model.Movie
+import com.nf98.moviecatalogue.api.model.TVShow
+import com.nf98.moviecatalogue.app.response.MovieResponse
+import com.nf98.moviecatalogue.app.response.TVShowResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,8 +18,6 @@ import java.util.*
 class MainViewModel : ViewModel() {
 
     companion object {
-        const val API_KEY = "f1fb599be2a8084210ab493502e6c728"
-
         @SuppressLint("ConstantLocale")
         val region: String = Locale.getDefault().country
 

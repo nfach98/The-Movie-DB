@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.model
+package com.nf98.moviecatalogue.api.model
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName

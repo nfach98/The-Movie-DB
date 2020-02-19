@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.adapter
+package com.nf98.moviecatalogue.app.adapter
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

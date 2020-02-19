@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.ui.detail
+package com.nf98.moviecatalogue.app.ui.detail
 
 
 import android.os.Bundle
@@ -11,14 +11,14 @@ import com.nf98.moviecatalogue.R
 /**
  * A simple [Fragment] subclass.
  */
-class FactFragment : Fragment() {
+class SummaryFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail_fact, container, false)
+        return inflater.inflate(R.layout.fragment_detail_overview, container, false)
     }
 
 

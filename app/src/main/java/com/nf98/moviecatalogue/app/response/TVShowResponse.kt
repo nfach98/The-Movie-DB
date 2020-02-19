@@ -1,7 +1,7 @@
-package com.nf98.moviecatalogue.response
+package com.nf98.moviecatalogue.app.response
 
 import com.google.gson.annotations.SerializedName
-import com.nf98.moviecatalogue.model.TVShow
+import com.nf98.moviecatalogue.api.model.TVShow
 
 class TVShowResponse (
     @SerializedName("results")

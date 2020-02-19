@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.adapter
+package com.nf98.moviecatalogue.app.adapter
 
 import android.content.Context
 import androidx.annotation.Nullable
@@ -6,9 +6,9 @@ import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.ui.detail.CreditFragment
-import com.nf98.moviecatalogue.ui.detail.FactFragment
-import com.nf98.moviecatalogue.ui.detail.SummaryFragment
+import com.nf98.moviecatalogue.app.ui.detail.CreditFragment
+import com.nf98.moviecatalogue.app.ui.detail.FactFragment
+import com.nf98.moviecatalogue.app.ui.detail.SummaryFragment
 import viewpagerwc.ui.dom.wrapping.WrappingFragmentPagerAdapter
 
 

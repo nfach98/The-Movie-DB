@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.adapter
+package com.nf98.moviecatalogue.app.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +7,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.model.Movie
-import com.nf98.moviecatalogue.model.TVShow
+import com.nf98.moviecatalogue.api.model.Movie
+import com.nf98.moviecatalogue.api.model.TVShow
 import kotlinx.android.synthetic.main.item_movie.view.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat

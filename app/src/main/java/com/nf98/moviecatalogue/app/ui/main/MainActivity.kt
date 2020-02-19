@@ -1,20 +1,15 @@
-package com.nf98.moviecatalogue.ui.main
+package com.nf98.moviecatalogue.app.ui.main
 
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 

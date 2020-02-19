@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.ui.main
+package com.nf98.moviecatalogue.app.ui.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.adapter.MainPagerAdapter
+import com.nf98.moviecatalogue.app.adapter.MainPagerAdapter
 import kotlinx.android.synthetic.main.fragment_main_discover.*
 
 class DiscoverFragment : Fragment() {

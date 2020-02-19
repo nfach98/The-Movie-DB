@@ -1,6 +1,7 @@
-package com.nf98.moviecatalogue
+package com.nf98.moviecatalogue.api
 
 import android.app.Application
+import com.nf98.moviecatalogue.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -11,12 +12,14 @@ class ApiMain : Application() {
 
     companion object {
         private const val BASE_API_URL = "https://api.themoviedb.org/3/"
+        const val API_KEY = "f1fb599be2a8084210ab493502e6c728"
     }
 
     private val client = OkHttpClient().newBuilder()
         .addInterceptor(HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         })
+        .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()

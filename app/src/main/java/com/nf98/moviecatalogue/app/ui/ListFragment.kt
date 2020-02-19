@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.ui
+package com.nf98.moviecatalogue.app.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,14 +12,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.adapter.ListAdapter
-import com.nf98.moviecatalogue.adapter.MainPagerAdapter
-import com.nf98.moviecatalogue.model.Movie
-import com.nf98.moviecatalogue.model.TVShow
-import com.nf98.moviecatalogue.ui.main.DiscoverFragmentDirections
-import com.nf98.moviecatalogue.ui.main.MovieFragmentDirections
-import com.nf98.moviecatalogue.ui.main.TVShowFragmentDirections
-import com.nf98.moviecatalogue.viewmodel.MainViewModel
+import com.nf98.moviecatalogue.app.adapter.ListAdapter
+import com.nf98.moviecatalogue.app.adapter.MainPagerAdapter
+import com.nf98.moviecatalogue.api.model.Movie
+import com.nf98.moviecatalogue.api.model.TVShow
+import com.nf98.moviecatalogue.app.ui.main.DiscoverFragmentDirections
+import com.nf98.moviecatalogue.app.ui.main.MovieFragmentDirections
+import com.nf98.moviecatalogue.app.ui.main.TVShowFragmentDirections
+import com.nf98.moviecatalogue.app.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.fragment_list.*
 
 class ListFragment : Fragment() {

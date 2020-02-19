@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.ui.detail
+package com.nf98.moviecatalogue.app.ui.detail
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,8 +8,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.ui.ListFragment
-import com.nf98.moviecatalogue.viewmodel.MainViewModel
+import com.nf98.moviecatalogue.app.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.fragment_detail_credit.*
 
 class CreditFragment : Fragment() {
