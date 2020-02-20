@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
+import kotlinx.android.synthetic.main.fragment_detail_fact.view.*
 import kotlinx.android.synthetic.main.item_movie.view.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -80,7 +81,7 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
 
                     tv_name.text = getTitle(item.originalLanguage, item.originalTitle, item.title)
                     tv_desc.text = item.overview
-                    item.releaseDate?.let { setDate(it) }
+                    tv_date.text = getDate(item.releaseDate)
                     setDonut(item.score)
 
                     itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
@@ -100,27 +101,19 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
                 else donut_score.text = "NR"
 
                 when (score) {
-                    in Int.MIN_VALUE..39 -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutRed)
-                    in 40..59 -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutOrange)
-                    in 60..69 -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutYellow)
-                    in 70..79 -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutLime)
-                    in 80..Int.MAX_VALUE -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutGreen)
+                    in Int.MIN_VALUE..39 -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutRed)
+                    in 40..59 -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutOrange)
+                    in 60..69 -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutYellow)
+                    in 70..79 -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutLime)
+                    in 80..Int.MAX_VALUE -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutGreen)
                 }
             }
         }
 
-        private fun setDate(input: String) {
+        private fun getDate(input: String?): String {
             val parser = SimpleDateFormat("yyyy-MM-dd")
             val format = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault())
-
-            with(itemView) {
-                tv_date.text = format.format(parser.parse(input))
-            }
+            return format.format(parser.parse(input))
         }
 
     }

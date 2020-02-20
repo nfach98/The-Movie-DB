@@ -53,7 +53,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun bindData(){
-        name.text = getTitle(movie.originalLanguage, movie.originalTitle, movie.title)
+        setTitle(movie.originalLanguage, movie.originalTitle, movie.title)
         setDate(movie.releaseDate)
         setScore(movie.score)
 
@@ -66,8 +66,9 @@ class DetailActivity : AppCompatActivity() {
             .into(backPoster)
     }
 
-    private fun getTitle(lang: String?, oriTitle: String?, intTitle: String?): String?{
-        return if(Locale.getDefault().language == lang) oriTitle else intTitle
+    private fun setTitle(lang: String?, oriTitle: String?, intTitle: String?){
+        if(Locale.getDefault().language == lang) date.text = oriTitle
+        else date.text = intTitle
     }
 
     private fun setScore(input: Float){
