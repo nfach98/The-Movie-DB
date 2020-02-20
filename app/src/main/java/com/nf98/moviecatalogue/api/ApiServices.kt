@@ -1,8 +1,8 @@
 package com.nf98.moviecatalogue.api
 
 import com.nf98.moviecatalogue.api.model.Movie
-import com.nf98.moviecatalogue.app.response.MovieResponse
-import com.nf98.moviecatalogue.app.response.TVShowResponse
+import com.nf98.moviecatalogue.api.response.MovieResponse
+import com.nf98.moviecatalogue.api.response.TVShowResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path

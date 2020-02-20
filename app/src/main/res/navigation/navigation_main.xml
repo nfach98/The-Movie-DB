@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_discover"
-        android:name="com.nf98.moviecatalogue.app.ui.main.DiscoverFragment"
+        android:name="com.nf98.moviecatalogue.app.main.fragment.DiscoverFragment"
         android:label="fragment_discover"
         tools:layout="@layout/fragment_main_discover" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/nav_movie"
-        android:name="com.nf98.moviecatalogue.app.ui.main.MovieFragment"
+        android:name="com.nf98.moviecatalogue.app.main.fragment.MovieFragment"
         android:label="MovieFragment"
         tools:layout="@layout/fragment_main_movie" >
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/nav_tv_show"
-        android:name="com.nf98.moviecatalogue.app.ui.main.TVShowFragment"
+        android:name="com.nf98.moviecatalogue.app.main.fragment.TVShowFragment"
         android:label="fragment_tvshow"
         tools:layout="@layout/fragment_main_tvshow" >
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <activity
         android:id="@+id/detailActivity"
-        android:name="com.nf98.moviecatalogue.app.ui.detail.DetailActivity"
+        android:name="com.nf98.moviecatalogue.app.detail.DetailActivity"
         android:label="DetailActivity" >
         <argument
             android:name="id"

@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.app.viewmodel
+package com.nf98.moviecatalogue.app.main
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import com.nf98.moviecatalogue.api.ApiMain
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
-import com.nf98.moviecatalogue.app.response.MovieResponse
-import com.nf98.moviecatalogue.app.response.TVShowResponse
+import com.nf98.moviecatalogue.api.response.MovieResponse
+import com.nf98.moviecatalogue.api.response.TVShowResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -55,11 +55,20 @@ class MainViewModel : ViewModel() {
         }
 
         val result = when (index) {
-            MOVIE_POPULAR -> ApiMain().services.getPopularMovies(region)
-            MOVIE_TOP_RATED -> ApiMain().services.getTopRatedMovies(region)
-            MOVIE_UPCOMING -> ApiMain().services.getUpcomingMovies(region)
-            MOVIE_NOW_PLAYING -> ApiMain().services.getNowPlayingMovies(region)
-            MOVIE_DISCOVER -> ApiMain().services.getDiscoverMovie(region, year, sort)
+            MOVIE_POPULAR -> ApiMain().services.getPopularMovies(
+                region
+            )
+            MOVIE_TOP_RATED -> ApiMain().services.getTopRatedMovies(
+                region
+            )
+            MOVIE_UPCOMING -> ApiMain().services.getUpcomingMovies(
+                region
+            )
+            MOVIE_NOW_PLAYING -> ApiMain().services.getNowPlayingMovies(
+                region
+            )
+            MOVIE_DISCOVER -> ApiMain().services.getDiscoverMovie(
+                region, year, sort)
             else -> throw IllegalArgumentException("Invalid type")
         }
 

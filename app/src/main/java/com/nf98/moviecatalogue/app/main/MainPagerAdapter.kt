@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.app.adapter
+package com.nf98.moviecatalogue.app.main
 
 import android.content.Context
 import androidx.annotation.StringRes
@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.app.ui.ListFragment
+import com.nf98.moviecatalogue.app.main.fragment.ListFragment
 
 class MainPagerAdapter(private val context: Context?, fm: FragmentManager, private val type: Int)
     : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.app.response
+package com.nf98.moviecatalogue.api.response
 
 import com.google.gson.annotations.SerializedName
 import com.nf98.moviecatalogue.api.model.TVShow

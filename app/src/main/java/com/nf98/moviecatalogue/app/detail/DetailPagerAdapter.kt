@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.app.adapter
+package com.nf98.moviecatalogue.app.detail
 
 import android.content.Context
 import androidx.annotation.Nullable
@@ -6,9 +6,9 @@ import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.app.ui.detail.CreditFragment
-import com.nf98.moviecatalogue.app.ui.detail.FactFragment
-import com.nf98.moviecatalogue.app.ui.detail.SummaryFragment
+import com.nf98.moviecatalogue.app.detail.fragment.CreditFragment
+import com.nf98.moviecatalogue.app.detail.fragment.FactFragment
+import com.nf98.moviecatalogue.app.detail.fragment.SummaryFragment
 import viewpagerwc.ui.dom.wrapping.WrappingFragmentPagerAdapter
 
 
@@ -34,16 +34,20 @@ class DetailPagerAdapter(private val context: Context, fm: FragmentManager, priv
         var fragment: Fragment? = null
         if(type == TYPE_MOVIE) {
             when (position) {
-                0 -> fragment = SummaryFragment()
+                0 -> fragment =
+                    SummaryFragment()
                 in 1..2 -> fragment = CreditFragment.newInstance(position)
-                3 -> fragment = FactFragment()
+                3 -> fragment =
+                    FactFragment()
             }
         }
         if(type == TYPE_TV) {
             when (position) {
-                0 -> fragment = SummaryFragment()
+                0 -> fragment =
+                    SummaryFragment()
                 in 1..3 -> fragment = CreditFragment.newInstance(position - 1)
-                4 -> fragment = FactFragment()
+                4 -> fragment =
+                    FactFragment()
             }
         }
 

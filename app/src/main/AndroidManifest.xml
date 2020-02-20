@@ -12,8 +12,8 @@
         android:supportsRtl="true"
         android:name=".api.ApiMain"
         android:theme="@style/AppTheme">
-        <activity android:name="com.nf98.moviecatalogue.app.ui.detail.DetailActivity"/>
-        <activity android:name="com.nf98.moviecatalogue.app.ui.main.MainActivity">
+        <activity android:name="com.nf98.moviecatalogue.app.detail.DetailActivity"/>
+        <activity android:name="com.nf98.moviecatalogue.app.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

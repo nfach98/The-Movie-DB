@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.app.ui.main
+package com.nf98.moviecatalogue.app.main
 
 import android.content.Intent
 import android.os.Bundle

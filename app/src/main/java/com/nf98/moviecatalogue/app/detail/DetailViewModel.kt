@@ -1,4 +1,4 @@
-package com.nf98.moviecatalogue.app.viewmodel
+package com.nf98.moviecatalogue.app.detail
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -22,7 +22,6 @@ class DetailViewModel : ViewModel() {
                 if(response.isSuccessful)
                     response.body().let { movie.postValue(it) }
             }
-
             override fun onFailure(call: Call<Movie>, t: Throwable) {
                 Log.d("MovieDB: ", t.message)
             }
