@@ -1,6 +1,8 @@
 package com.nf98.moviecatalogue.api
 
 import com.nf98.moviecatalogue.api.model.Movie
+import com.nf98.moviecatalogue.api.model.TVShow
+import com.nf98.moviecatalogue.api.response.CreditsResponse
 import com.nf98.moviecatalogue.api.response.MovieResponse
 import com.nf98.moviecatalogue.api.response.TVShowResponse
 import retrofit2.Call
@@ -48,4 +50,13 @@ interface ApiServices {
 
     @GET("movie/{id}?api_key=${ApiMain.API_KEY}")
     fun getMovie(@Path("id") id: Int): Call<Movie>
+
+    @GET("movie/{id}/credits?api_key=${ApiMain.API_KEY}")
+    fun getMovieCredits(@Path("id") id: Int): Call<CreditsResponse>
+
+    @GET("tv/{id}?api_key=${ApiMain.API_KEY}")
+    fun getTVShow(@Path("id") id: Int): Call<TVShow>
+
+    @GET("tv/{id}/credits?api_key=${ApiMain.API_KEY}")
+    fun getTVCredits(@Path("id") id: Int): Call<CreditsResponse>
 }

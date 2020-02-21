@@ -33,6 +33,9 @@
     <string name="crew">Kru</string>
     <string name="fact">Fakta</string>
 
+    <string name="hour">j</string>
+    <string name="minute">m</string>
+
     <string name="pop_desc">Popularitas ↓</string>
     <string name="pop_asc">Popularitas ↑</string>
     <string name="score_desc">Nilai ↓</string>

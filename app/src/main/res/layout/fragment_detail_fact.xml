@@ -23,27 +23,10 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Stats" />
 
-
-    <TextView
-        android:id="@+id/tvRate"
-        style="@style/TextDetail.Title"
-        app:layout_constraintTop_toBottomOf="@id/genre"
-        app:layout_constraintStart_toStartOf="parent"
-        android:text="Rating"/>
-
-    <TextView
-        android:id="@+id/rate"
-        android:layout_width="wrap_content"
-        style="@style/TextDetail.Content"
-        app:layout_constraintTop_toBottomOf="@id/tvRate"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="Stats" />
-
-
     <TextView
         android:id="@+id/tvStatus"
         style="@style/TextDetail.Title"
-        app:layout_constraintTop_toBottomOf="@id/rate"
+        app:layout_constraintTop_toBottomOf="@id/genre"
         app:layout_constraintStart_toStartOf="parent"
         android:text="Status"/>
 

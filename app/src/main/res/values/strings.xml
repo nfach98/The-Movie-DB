@@ -37,6 +37,9 @@
     <string name="crew">Crew</string>
     <string name="fact">Fact</string>
 
+    <string name="hour">h</string>
+    <string name="minute">m</string>
+
     <string name="pop_desc">Popularity ↓</string>
     <string name="pop_asc">Popularity ↑</string>
     <string name="score_desc">Score ↓</string>

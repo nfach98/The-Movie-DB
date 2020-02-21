@@ -12,6 +12,10 @@ data class Movie(
     @Expose
     var voteCount: Int = 0,
 
+    @SerializedName("runtime")
+    @Expose
+    var duration: Int = 0,
+
     @SerializedName("video")
     @Expose
     var video: Boolean? = null,
@@ -40,13 +44,25 @@ data class Movie(
     @Expose
     var originalTitle: String? = null,
 
-    @SerializedName("genre_ids")
+    @SerializedName("genres")
     @Expose
-    var genreIds: List<Int>? = null,
+    var genres : List<Genre>? = null,
 
     @SerializedName("title")
     @Expose
     var title: String? = null,
+
+    @SerializedName("status")
+    @Expose
+    var status: String? = null,
+
+    @SerializedName("budget")
+    @Expose
+    var budget: Int = 0,
+
+    @SerializedName("revenue")
+    @Expose
+    var revenue: Int = 0,
 
     @SerializedName("vote_average")
     @Expose

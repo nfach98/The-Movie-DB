@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="200dp"
+    android:layout_margin="12dp"
+    android:elevation="2dp"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/iv_photo"
+        android:layout_width="103dp"
+        android:layout_height="131dp"
+        android:scaleType="fitXY"
+        tools:src="@android:color/holo_green_dark" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/iv_photo"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:textSize="12sp"
+        style="@style/TextDetail.Title"
+        android:maxLines="2"
+        tools:text="Nama"/>
+
+    <TextView
+        android:id="@+id/tv_char"
+        android:layout_width="wrap_content"
+        android:layout_below="@id/tv_name"
+        android:layout_marginTop="2dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:textSize="12sp"
+        style="@style/TextDetail.Content"
+        android:maxLines="2"
+        tools:text="Nama sebagai" />
+
+</RelativeLayout>

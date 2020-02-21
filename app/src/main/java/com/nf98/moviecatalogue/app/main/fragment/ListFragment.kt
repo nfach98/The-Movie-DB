@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
+import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import com.nf98.moviecatalogue.app.main.*
 import kotlinx.android.synthetic.main.fragment_list.*
 
@@ -109,21 +110,21 @@ class ListFragment : Fragment() {
     private fun toDetail(type: Int, data: Any) {
         when(type) {
             MainPagerAdapter.TYPE_MOVIE -> {
-                val direction =
-                    MovieFragmentDirections.actionNavMovieToDetailActivity()
+                val direction = MovieFragmentDirections.actionNavMovieToDetailActivity()
                 direction.id = (data as Movie).id
+                direction.type = DetailPagerAdapter.TYPE_MOVIE
                 view?.findNavController()?.navigate(direction)
             }
             MainPagerAdapter.TYPE_TV -> {
-                val direction =
-                    TVShowFragmentDirections.actionNavTvShowToDetailActivity()
+                val direction = TVShowFragmentDirections.actionNavTvShowToDetailActivity()
                 direction.id = (data as TVShow).id
+                direction.type = DetailPagerAdapter.TYPE_TV
                 view?.findNavController()?.navigate(direction)
             }
             MainPagerAdapter.TYPE_DISCOVER -> {
-                val direction =
-                    DiscoverFragmentDirections.actionNavDiscoverToDetailActivity()
+                val direction = DiscoverFragmentDirections.actionNavDiscoverToDetailActivity()
                 direction.id = if(index == 8) (data as Movie).id else (data as TVShow).id
+                direction.type = if(index == 8) DetailPagerAdapter.TYPE_MOVIE else DetailPagerAdapter.TYPE_TV
                 view?.findNavController()?.navigate(direction)
             }
         }

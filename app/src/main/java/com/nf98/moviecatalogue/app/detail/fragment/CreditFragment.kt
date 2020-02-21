@@ -5,15 +5,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nf98.moviecatalogue.R
+import com.nf98.moviecatalogue.api.model.Credit
+import com.nf98.moviecatalogue.app.detail.DetailActivity
+import com.nf98.moviecatalogue.app.detail.DetailViewModel
 import com.nf98.moviecatalogue.app.main.MainViewModel
 import kotlinx.android.synthetic.main.fragment_detail_credit.*
 
 class CreditFragment : Fragment() {
 
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var viewModel: DetailViewModel
     private var index = 1
 
     companion object {
@@ -46,20 +50,33 @@ class CreditFragment : Fragment() {
         if (arguments != null)
             index = arguments?.getInt(ARG_SECTION_NUMBER, 0) as Int
 
-        mainViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
-            MainViewModel::class.java)
+        viewModel = (activity as DetailActivity).viewModel
 
         when(index) {
             TYPE_SEASON -> {
 
             }
             TYPE_CAST -> {
-
+                viewModel.getCasts((activity as DetailActivity).type, (activity as DetailActivity).id).observe(this, Observer {
+                    if (it != null)
+                        refreshList(it)
+                })
             }
             TYPE_CREW -> {
-
+                viewModel.getCrews((activity as DetailActivity).type, (activity as DetailActivity).id).observe(this, Observer {
+                    if (it != null)
+                        refreshList(it)
+                })
             }
         }
+    }
+
+    private fun refreshList(it: ArrayList<Credit>) {
+        val adapter = CreditAdapter()
+        adapter.notifyDataSetChanged()
+        rvCredit.adapter = adapter
+        adapter.setData(index, it)
+        showLoading(false)
     }
 
     private fun showLoading(state: Boolean) {

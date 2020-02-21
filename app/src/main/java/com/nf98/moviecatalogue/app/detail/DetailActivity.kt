@@ -1,6 +1,7 @@
 package com.nf98.moviecatalogue.app.detail
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -9,8 +10,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.navArgs
 import com.bumptech.glide.Glide
 import com.nf98.moviecatalogue.R
+import com.nf98.moviecatalogue.api.model.Genre
 import com.nf98.moviecatalogue.api.model.Movie
+import com.nf98.moviecatalogue.api.model.TVShow
 import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.fragment_detail_summary.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -18,8 +22,13 @@ import java.util.*
 class DetailActivity : AppCompatActivity() {
 
     private val arguments: DetailActivityArgs by navArgs()
-    private lateinit var viewModel: DetailViewModel
-    private lateinit var movie: Movie
+    lateinit var viewModel: DetailViewModel
+
+    var movie = Movie()
+    var tvShow = TVShow()
+
+    var id = 0
+    var type = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,19 +38,31 @@ class DetailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = ""
 
-        val id = arguments.id
+        id = arguments.id
+        type = arguments.type
+
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(DetailViewModel::class.java)
 
-        viewModel.getMovie(id).observe(this, Observer {
-            if (it != null) {
-                movie = it
-                bindData()
+        when(type){
+            DetailPagerAdapter.TYPE_MOVIE -> {
+                viewModel.getMovie(id).observe(this, Observer {
+                    if (it != null) {
+                        movie = it
+                        setAdapter(arguments.type)
+                        bind()
+                    }
+                })
             }
-        })
-
-        val pagerAdapter = DetailPagerAdapter(this, supportFragmentManager, DetailPagerAdapter.TYPE_TV)
-        pagerDetail.adapter = pagerAdapter
-        tabDetail.setupWithViewPager(pagerDetail)
+            DetailPagerAdapter.TYPE_TV -> {
+                viewModel.getTVShow(id).observe(this, Observer {
+                    if (it != null) {
+                        tvShow = it
+                        setAdapter(arguments.type)
+                        bind()
+                    }
+                })
+            }
+        }
 
     }
 
@@ -52,23 +73,44 @@ class DetailActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun bindData(){
-        setTitle(movie.originalLanguage, movie.originalTitle, movie.title)
-        setDate(movie.releaseDate)
-        setScore(movie.score)
+    private fun bind(){
+        if(type == DetailPagerAdapter.TYPE_MOVIE){
+            setTitle(movie.originalLanguage, movie.originalTitle, movie.title)
+            setDate(movie.releaseDate)
+            setScore(movie.score)
 
-        Glide.with(this)
-            .load("https://image.tmdb.org/t/p/w185${movie.posterPath}")
-            .into(poster)
+            Glide.with(this)
+                .load("https://image.tmdb.org/t/p/w185${movie.posterPath}")
+                .into(poster)
 
-        Glide.with(this)
-            .load("https://image.tmdb.org/t/p/original${movie.backdropPath}")
-            .into(backPoster)
+            Glide.with(this)
+                .load("https://image.tmdb.org/t/p/original${movie.backdropPath}")
+                .into(backPoster)
+        }
+        if(type == DetailPagerAdapter.TYPE_TV){
+            setTitle(tvShow.originalLanguage, tvShow.originalName, tvShow.name)
+            setDate(tvShow.firstAirDate)
+            setScore(tvShow.score)
+
+            Glide.with(this)
+                .load("https://image.tmdb.org/t/p/w185${tvShow.posterPath}")
+                .into(poster)
+
+            Glide.with(this)
+                .load("https://image.tmdb.org/t/p/original${tvShow.backdropPath}")
+                .into(backPoster)
+        }
+    }
+
+    private fun setAdapter(type: Int){
+        val pagerAdapter = DetailPagerAdapter(this, supportFragmentManager, type)
+        pagerDetail.adapter = pagerAdapter
+        tabDetail.setupWithViewPager(pagerDetail)
     }
 
     private fun setTitle(lang: String?, oriTitle: String?, intTitle: String?){
-        if(Locale.getDefault().language == lang) date.text = oriTitle
-        else date.text = intTitle
+        if(Locale.getDefault().language == lang){ name.text = oriTitle }
+        else { name.text = intTitle }
     }
 
     private fun setScore(input: Float){
@@ -92,4 +134,5 @@ class DetailActivity : AppCompatActivity() {
         val format = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault())
         date.text = format.format(parser.parse(input))
     }
+
 }

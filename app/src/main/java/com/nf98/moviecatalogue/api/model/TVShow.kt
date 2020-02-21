@@ -4,13 +4,29 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class TVShow (
+    @SerializedName("episode_run_time")
+    @Expose
+    var duration : List<Int>? = null,
+
     @SerializedName("original_name")
     @Expose
     var originalName: String? = null,
 
+    @SerializedName("genres")
+    @Expose
+    var genres : List<Genre>? = null,
+
     @SerializedName("genre_ids")
     @Expose
     var genreIds: List<Int>? = null,
+
+    @SerializedName("number_of_seasons")
+    @Expose
+    var number_of_seasons : Int = 0,
+
+    @SerializedName("seasons")
+    @Expose
+    var seasons : List<Season>? = null,
 
     @SerializedName("name")
     @Expose
@@ -54,4 +70,8 @@ data class TVShow (
 
     @SerializedName("poster_path")
     @Expose
-    var posterPath: String? = null )
+    var posterPath: String? = null,
+
+    @SerializedName("status")
+    @Expose
+    var status : String? = null)
