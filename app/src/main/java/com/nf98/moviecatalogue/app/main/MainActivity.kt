@@ -5,13 +5,14 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.nf98.moviecatalogue.R
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,16 +20,11 @@ class MainActivity : AppCompatActivity() {
 
         val navController = findNavController(nav_main)
         bnv_main.setupWithNavController(navController)
+
+        iconSetting.setOnClickListener(this)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.menu_setting)
-            startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
-        return super.onOptionsItemSelected(item)
+    override fun onClick(v: View) {
+        if(v.id == R.id.iconSetting) startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
     }
 }

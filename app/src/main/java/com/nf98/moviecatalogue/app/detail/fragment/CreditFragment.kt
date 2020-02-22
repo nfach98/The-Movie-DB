@@ -6,13 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.api.model.Credit
+import com.nf98.moviecatalogue.api.model.Season
 import com.nf98.moviecatalogue.app.detail.DetailActivity
 import com.nf98.moviecatalogue.app.detail.DetailViewModel
-import com.nf98.moviecatalogue.app.main.MainViewModel
 import kotlinx.android.synthetic.main.fragment_detail_credit.*
 
 class CreditFragment : Fragment() {
@@ -28,8 +26,7 @@ class CreditFragment : Fragment() {
         const val TYPE_CREW = 2
 
         fun newInstance(index: Int): CreditFragment {
-            val fragment =
-                CreditFragment()
+            val fragment = CreditFragment()
             val bundle = Bundle()
             bundle.putInt(ARG_SECTION_NUMBER, index)
             fragment.arguments = bundle
@@ -44,8 +41,9 @@ class CreditFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        showLoading(false)
         rvCredit.layoutManager = LinearLayoutManager(activity)
+        rvCredit.isNestedScrollingEnabled = false
+        rvCredit.setHasFixedSize(false)
 
         if (arguments != null)
             index = arguments?.getInt(ARG_SECTION_NUMBER, 0) as Int
@@ -54,7 +52,9 @@ class CreditFragment : Fragment() {
 
         when(index) {
             TYPE_SEASON -> {
-
+                val list = arrayListOf<Season>()
+                (activity as DetailActivity).tvShow.seasons?.let { it -> list.addAll(it) }
+                refreshList(list)
             }
             TYPE_CAST -> {
                 viewModel.getCasts((activity as DetailActivity).type, (activity as DetailActivity).id).observe(this, Observer {
@@ -71,18 +71,10 @@ class CreditFragment : Fragment() {
         }
     }
 
-    private fun refreshList(it: ArrayList<Credit>) {
+    private fun refreshList(it: ArrayList<*>) {
         val adapter = CreditAdapter()
         adapter.notifyDataSetChanged()
         rvCredit.adapter = adapter
         adapter.setData(index, it)
-        showLoading(false)
-    }
-
-    private fun showLoading(state: Boolean) {
-        if(state)
-            creditProg.visibility = View.VISIBLE
-        else
-            creditProg.visibility = View.GONE
     }
 }

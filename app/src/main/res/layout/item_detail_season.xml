@@ -39,7 +39,7 @@
         tools:text="2020 | 10 Episodes"/>
 
     <TextView
-        android:id="@+id/tvCurSeasonDesc"
+        android:id="@+id/tv_seasonDesc"
         android:layout_width="wrap_content"
         android:layout_toEndOf="@id/iv_season"
         android:layout_below="@id/tv_sub"

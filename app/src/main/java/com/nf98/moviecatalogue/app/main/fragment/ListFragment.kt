@@ -45,8 +45,7 @@ class ListFragment : Fragment() {
 
         index = arguments?.getInt(ARG_SECTION_NUMBER, 0) as Int
 
-        mainViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(
-            MainViewModel::class.java)
+        mainViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(MainViewModel::class.java)
 
         showLoading(true)
         rvList.layoutManager = LinearLayoutManager(activity)

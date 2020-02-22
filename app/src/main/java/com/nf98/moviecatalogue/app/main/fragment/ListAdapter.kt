@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
@@ -71,12 +72,13 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
     inner class MovieViewHolder(itemView: View): ItemViewHolder<Movie>(itemView) {
         override fun bind(item: Movie) {
             with(itemView) {
-                    /*val options = RequestOptions()
-                        .placeholder(R.drawable.your_placeholder_image)
-                        .error(R.drawable.your_error_image)*/
+                val options = RequestOptions()
+                    .placeholder(R.drawable.img_poster_na)
+                    .error(R.drawable.img_poster_na)
 
                     Glide.with(this)
                         .load("https://image.tmdb.org/t/p/w154${item.posterPath}")
+                        .apply(options)
                         .into(iv_poster)
 
                     tv_name.text = getTitle(item.originalLanguage, item.originalTitle, item.title)

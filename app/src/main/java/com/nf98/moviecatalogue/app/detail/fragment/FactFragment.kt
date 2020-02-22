@@ -1,5 +1,6 @@
 package com.nf98.moviecatalogue.app.detail.fragment
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -59,7 +60,9 @@ class FactFragment : Fragment() {
                 setDate(tvShow.firstAirDate)
                 lang.text = tvShow.originalLanguage
                 runtime.text = getEpisodeDuration(tvShow.duration)
+                tvBudget.visibility = View.GONE
                 budget.visibility = View.GONE
+                tvRevenue.visibility = View.GONE
                 revenue.visibility = View.GONE
             }
         }

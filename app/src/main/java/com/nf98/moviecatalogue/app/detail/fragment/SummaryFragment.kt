@@ -1,21 +1,28 @@
 package com.nf98.moviecatalogue.app.detail.fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.api.model.Credit
-import com.nf98.moviecatalogue.api.model.Genre
-import com.nf98.moviecatalogue.api.model.Movie
-import com.nf98.moviecatalogue.api.model.TVShow
+import com.nf98.moviecatalogue.api.model.*
 import com.nf98.moviecatalogue.app.detail.DetailActivity
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
+import com.nf98.moviecatalogue.app.detail.DetailViewModel
+import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.fragment_detail_summary.*
+
 
 class SummaryFragment : Fragment() {
 
+    private lateinit var viewModel: DetailViewModel
     private lateinit var movie: Movie
     private lateinit var tvShow: TVShow
     var type = 0
@@ -27,12 +34,26 @@ class SummaryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        /*tvAllSeason.setOnClickListener(this)
+        tvFullCast.setOnClickListener(this)
+        tvFullCrew.setOnClickListener(this)*/
+
         type = (activity as DetailActivity).type
 
-        if (type == DetailPagerAdapter.TYPE_MOVIE)
-            movie = (activity as DetailActivity).movie
-        if (type == DetailPagerAdapter.TYPE_TV)
-            tvShow = (activity as DetailActivity).tvShow
+        if (type == DetailPagerAdapter.TYPE_MOVIE) movie = (activity as DetailActivity).movie
+        if (type == DetailPagerAdapter.TYPE_TV) tvShow = (activity as DetailActivity).tvShow
+
+        viewModel = (activity as DetailActivity).viewModel
+
+        rvTopCast.apply {
+            layoutManager = LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false)
+            setHasFixedSize(true)
+        }
+        rvTopCrew.apply {
+            layoutManager = GridLayoutManager(activity, 2)
+            isNestedScrollingEnabled = false
+            setHasFixedSize(false)
+        }
 
         bind()
     }
@@ -41,17 +62,68 @@ class SummaryFragment : Fragment() {
         when(type){
             DetailPagerAdapter.TYPE_MOVIE -> {
                 showSeason(false)
-
-                tvRateDurGenre.text = "${getDuration(movie.duration)} | ${getGenre(movie.genres)}"
+                showCrew(true)
+                tvDurGenre.text = "${getDuration(movie.duration)} | ${getGenre(movie.genres)}"
                 desc.text = movie.overview
+                getCasts()
+                getCrews()
             }
             DetailPagerAdapter.TYPE_TV -> {
                 showSeason(true)
-
-                tvRateDurGenre.text = "${getEpisodeDuration(tvShow.duration)} | ${getGenre(tvShow.genres)}"
+                showCrew(false)
+                tvDurGenre.text = "${getEpisodeDuration(tvShow.duration)} | ${getGenre(tvShow.genres)}"
                 desc.text = tvShow.overview
+                getCasts()
+                getSeason()
             }
         }
+    }
+
+    private fun getSeason(){
+        val list = tvShow.seasons
+        var season = Season()
+
+        if (list != null) {
+            for (item in list) {
+                if(item.season_number == tvShow.number_of_seasons)
+                    season = item
+            }
+        }
+
+        val options = RequestOptions()
+            .placeholder(R.drawable.img_poster_na)
+            .error(R.drawable.img_poster_na)
+
+        Glide.with(this)
+            .load("https://image.tmdb.org/t/p/w154${season.poster_path}")
+            .apply(options)
+            .into(ivCurSeason)
+
+        tvCurSeasonTitle.text = season.name
+        tvCurSeasonSub.text = "${season.air_date?.subSequence(0..3)} | ${season.episode_count} episode"
+        tvCurSeasonDesc.text = season.overview
+    }
+
+    private fun getCasts(){
+        viewModel.getCasts(type, (activity as DetailActivity).id).observe(this, Observer {
+            if (it != null) {
+                val list = ArrayList<Credit>()
+                for(index in 0..4)
+                    list.add(it[index])
+                refreshList(SummaryAdapter.TYPE_CAST, list)
+            }
+        })
+    }
+
+    private fun getCrews(){
+        viewModel.getCrews(type, (activity as DetailActivity).id).observe(this, Observer {
+            if (it != null && it.size != 0){
+                val list = ArrayList<Credit>()
+                for(index in 0..3)
+                    list.add(it[index])
+                refreshList(SummaryAdapter.TYPE_CREW, list)
+            }
+        })
     }
 
     private fun getGenre(genres: List<Genre>?): String {
@@ -89,6 +161,18 @@ class SummaryFragment : Fragment() {
         return res
     }
 
+    private fun refreshList(type: Int, it: ArrayList<Credit>) {
+        val adapter = SummaryAdapter()
+        adapter.apply {
+            notifyDataSetChanged()
+            setData(type, it)
+        }
+        when(type){
+            SummaryAdapter.TYPE_CAST -> rvTopCast.adapter = adapter
+            SummaryAdapter.TYPE_CREW -> rvTopCrew.adapter = adapter
+        }
+    }
+
     private fun showSeason(state: Boolean){
         if(state){
             tvSeason.visibility = View.VISIBLE
@@ -105,4 +189,41 @@ class SummaryFragment : Fragment() {
             tvCurSeasonDesc.visibility = View.GONE
         }
     }
+
+    private fun showCrew(state: Boolean){
+        if(state){
+            tvTopCrew.visibility = View.VISIBLE
+            rvTopCrew.visibility = View.VISIBLE
+        }
+        else{
+            tvTopCrew.visibility = View.GONE
+            rvTopCrew.visibility = View.GONE
+        }
+    }
+
+    private fun showCast(state: Boolean){
+        if(state){
+            tvTopCast.visibility = View.VISIBLE
+            rvTopCast.visibility = View.VISIBLE
+        }
+        else{
+            tvTopCast.visibility = View.GONE
+            rvTopCast.visibility = View.GONE
+        }
+    }
+
+    /*private fun movePager(position: Int){
+        Handler().post { pagerDetail.currentItem = position }
+    }
+
+    override fun onClick(v: View) {
+        when(v.id){
+            R.id.tvAllSeason -> if(type == DetailPagerAdapter.TYPE_TV) movePager( 1)
+            R.id.tvFullCast -> {
+                if(type == DetailPagerAdapter.TYPE_MOVIE) movePager(1)
+                if(type == DetailPagerAdapter.TYPE_TV) movePager(2)
+            }
+            R.id.tvFullCrew -> if(type == DetailPagerAdapter.TYPE_MOVIE) movePager(2)
+        }
+    }*/
 }

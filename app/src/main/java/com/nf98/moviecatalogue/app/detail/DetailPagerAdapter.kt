@@ -26,7 +26,7 @@ class DetailPagerAdapter(private val context: Context, fm: FragmentManager, priv
     init {
         when(type) {
             TYPE_MOVIE -> TITLES = intArrayOf(R.string.summary, R.string.cast, R.string.crew, R.string.fact)
-            TYPE_TV -> TITLES = intArrayOf(R.string.summary, R.string.season, R.string.cast, R.string.crew, R.string.fact)
+            TYPE_TV -> TITLES = intArrayOf(R.string.summary, R.string.season, R.string.cast, R.string.fact)
         }
     }
 
@@ -37,17 +37,15 @@ class DetailPagerAdapter(private val context: Context, fm: FragmentManager, priv
                 0 -> fragment =
                     SummaryFragment()
                 in 1..2 -> fragment = CreditFragment.newInstance(position)
-                3 -> fragment =
-                    FactFragment()
+                3 -> fragment = FactFragment()
             }
         }
         if(type == TYPE_TV) {
             when (position) {
                 0 -> fragment =
                     SummaryFragment()
-                in 1..3 -> fragment = CreditFragment.newInstance(position - 1)
-                4 -> fragment =
-                    FactFragment()
+                in 1..2 -> fragment = CreditFragment.newInstance(position - 1)
+                3 -> fragment = FactFragment()
             }
         }
 

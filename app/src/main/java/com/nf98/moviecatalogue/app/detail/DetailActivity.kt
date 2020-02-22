@@ -1,20 +1,19 @@
 package com.nf98.moviecatalogue.app.detail
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.navArgs
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
-import com.nf98.moviecatalogue.api.model.Genre
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 import kotlinx.android.synthetic.main.activity_detail.*
-import kotlinx.android.synthetic.main.fragment_detail_summary.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,8 +34,12 @@ class DetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_detail)
 
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = ""
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = ""
+        }
+
+        showLoading(true)
 
         id = arguments.id
         type = arguments.type
@@ -74,6 +77,10 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun bind(){
+        val options = RequestOptions()
+            .placeholder(R.drawable.img_poster_na)
+            .error(R.drawable.img_poster_na)
+
         if(type == DetailPagerAdapter.TYPE_MOVIE){
             setTitle(movie.originalLanguage, movie.originalTitle, movie.title)
             setDate(movie.releaseDate)
@@ -81,10 +88,12 @@ class DetailActivity : AppCompatActivity() {
 
             Glide.with(this)
                 .load("https://image.tmdb.org/t/p/w185${movie.posterPath}")
+                .apply(options)
                 .into(poster)
 
             Glide.with(this)
                 .load("https://image.tmdb.org/t/p/original${movie.backdropPath}")
+                .apply(options)
                 .into(backPoster)
         }
         if(type == DetailPagerAdapter.TYPE_TV){
@@ -94,12 +103,15 @@ class DetailActivity : AppCompatActivity() {
 
             Glide.with(this)
                 .load("https://image.tmdb.org/t/p/w185${tvShow.posterPath}")
+                .apply(options)
                 .into(poster)
 
             Glide.with(this)
                 .load("https://image.tmdb.org/t/p/original${tvShow.backdropPath}")
+                .apply(options)
                 .into(backPoster)
         }
+        showLoading(false)
     }
 
     private fun setAdapter(type: Int){
@@ -134,5 +146,7 @@ class DetailActivity : AppCompatActivity() {
         val format = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault())
         date.text = format.format(parser.parse(input))
     }
+
+    private fun showLoading(state: Boolean) { prog.visibility = if(state) View.VISIBLE else View.GONE }
 
 }

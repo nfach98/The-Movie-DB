@@ -8,7 +8,7 @@
     tools:context=".app.detail.fragment.SummaryFragment">
 
     <TextView
-        android:id="@+id/tvRateDurGenre"
+        android:id="@+id/tvDurGenre"
         style="@style/TextDetail.Title"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
@@ -21,7 +21,7 @@
         android:id="@+id/desc"
         style="@style/TextDetail.Content"
         android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/tvRateDurGenre"
+        app:layout_constraintTop_toBottomOf="@id/tvDurGenre"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="Deskripsi"/>
@@ -99,20 +99,21 @@
         app:layout_constraintEnd_toEndOf="@id/curSeason"
         tools:text="Lorem ipsum dolor sit amet"/>
 
-    <TextView
+    <!--<TextView
         android:id="@+id/tvAllSeason"
         style="@style/TextDetail.Content"
         android:textStyle="bold"
         android:textColor="@color/colorAccent"
         android:text="@string/all_seasons"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/curSeason"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"/>-->
 
     <TextView
         android:id="@+id/tvTopCrew"
         style="@style/TextDetail.Title"
         android:text="@string/feat_crew"
-        app:layout_constraintTop_toBottomOf="@id/tvAllSeason"
+        app:layout_constraintTop_toBottomOf="@id/curSeason"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -122,23 +123,25 @@
         android:layout_marginTop="4dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/tvTopCrew"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
+    <!--<TextView
         android:id="@+id/tvFullCrew"
         style="@style/TextDetail.Content"
         android:textStyle="bold"
         android:textColor="@color/colorAccent"
         android:text="@string/full_crew"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@id/rvTopCrew"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"/>-->
 
     <TextView
         android:id="@+id/tvTopCast"
         style="@style/TextDetail.Title"
         android:text="@string/top_cast"
-        app:layout_constraintTop_toBottomOf="@id/tvFullCrew"
+        app:layout_constraintTop_toBottomOf="@id/rvTopCrew"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -148,18 +151,21 @@
         android:layout_marginTop="4dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/tvTopCast"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
+    <!--<TextView
         android:id="@+id/tvFullCast"
         style="@style/TextDetail.Content"
         android:textStyle="bold"
         android:textColor="@color/colorAccent"
         android:text="@string/full_cast"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="12dp"
         app:layout_constraintTop_toBottomOf="@id/rvTopCast"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"/>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
