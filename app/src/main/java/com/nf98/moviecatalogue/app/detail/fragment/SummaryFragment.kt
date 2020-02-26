@@ -1,7 +1,6 @@
 package com.nf98.moviecatalogue.app.detail.fragment
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +15,7 @@ import com.nf98.moviecatalogue.api.model.*
 import com.nf98.moviecatalogue.app.detail.DetailActivity
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import com.nf98.moviecatalogue.app.detail.DetailViewModel
-import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.fragment_detail_summary.*
-
 
 class SummaryFragment : Fragment() {
 
@@ -106,12 +103,19 @@ class SummaryFragment : Fragment() {
 
     private fun getCasts(){
         viewModel.getCasts(type, (activity as DetailActivity).id).observe(this, Observer {
-            if (it != null) {
+            if (it != null && it.size != 0) {
                 val list = ArrayList<Credit>()
-                for(index in 0..4)
-                    list.add(it[index])
+                if(it.size >= 5) {
+                    for (index in 0..4)
+                        list.add(it[index])
+                }
+                else{
+                    for (item in it)
+                        list.add(item)
+                }
                 refreshList(SummaryAdapter.TYPE_CAST, list)
             }
+            else showCast(false)
         })
     }
 
@@ -119,10 +123,17 @@ class SummaryFragment : Fragment() {
         viewModel.getCrews(type, (activity as DetailActivity).id).observe(this, Observer {
             if (it != null && it.size != 0){
                 val list = ArrayList<Credit>()
-                for(index in 0..3)
-                    list.add(it[index])
+                if(it.size >= 4) {
+                    for (index in 0..3)
+                        list.add(it[index])
+                }
+                else{
+                    for (item in it)
+                        list.add(item)
+                }
                 refreshList(SummaryAdapter.TYPE_CREW, list)
             }
+            else showCrew(false)
         })
     }
 

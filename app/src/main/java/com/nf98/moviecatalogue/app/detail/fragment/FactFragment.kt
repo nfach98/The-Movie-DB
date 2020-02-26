@@ -69,7 +69,7 @@ class FactFragment : Fragment() {
     }
 
     private fun setDate(input: String?) {
-        val parser = SimpleDateFormat("yyyy-MM-dd")
+        val parser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val format = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault())
         date.text = format.format(parser.parse(input))
     }

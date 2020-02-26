@@ -40,6 +40,12 @@
     <string name="hour">h</string>
     <string name="minute">m</string>
 
+    <string name="status" translatable="false">Status</string>
+    <string name="release_date">Release Date</string>
+    <string name="runtime">Runtime</string>
+    <string name="budget">Budget</string>
+    <string name="revenue">Revenue</string>
+
     <string name="pop_desc">Popularity ↓</string>
     <string name="pop_asc">Popularity ↑</string>
     <string name="score_desc">Score ↓</string>
@@ -68,5 +74,5 @@
         <item>@string/rel_date_desc</item>
         <item>@string/rel_date_asc</item>
     </string-array>
-    
+
 </resources>

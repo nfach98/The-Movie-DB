@@ -14,6 +14,7 @@
             android:id="@+id/action_nav_discover_to_detailActivity"
             app:destination="@id/detailActivity" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_movie"
         android:name="com.nf98.moviecatalogue.app.main.fragment.MovieFragment"
@@ -23,6 +24,7 @@
             android:id="@+id/action_nav_movie_to_detailActivity"
             app:destination="@id/detailActivity" />
     </fragment>
+
     <fragment
         android:id="@+id/nav_tv_show"
         android:name="com.nf98.moviecatalogue.app.main.fragment.TVShowFragment"
@@ -32,6 +34,17 @@
             android:id="@+id/action_nav_tv_show_to_detailActivity"
             app:destination="@id/detailActivity" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_favorite"
+        android:name="com.nf98.moviecatalogue.app.main.fragment.FavoriteFragment"
+        android:label="fragment_main_favorite"
+        tools:layout="@layout/fragment_main_favorite" >
+        <action
+            android:id="@+id/action_nav_favorite_to_detailActivity"
+            app:destination="@id/detailActivity" />
+    </fragment>
+
     <activity
         android:id="@+id/detailActivity"
         android:name="com.nf98.moviecatalogue.app.detail.DetailActivity"
@@ -45,5 +58,4 @@
             app:argType="integer"
             android:defaultValue="0" />
     </activity>
-
 </navigation>

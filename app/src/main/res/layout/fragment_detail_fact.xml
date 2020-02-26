@@ -28,7 +28,7 @@
         style="@style/TextDetail.Title"
         app:layout_constraintTop_toBottomOf="@id/genre"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="Status"/>
+        android:text="@string/status"/>
 
     <TextView
         android:id="@+id/status"
@@ -44,7 +44,7 @@
         style="@style/TextDetail.Title"
         app:layout_constraintTop_toBottomOf="@id/status"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="Release Date"/>
+        android:text="@string/release_date"/>
 
     <TextView
         android:id="@+id/date"
@@ -60,7 +60,7 @@
         style="@style/TextDetail.Title"
         app:layout_constraintTop_toBottomOf="@id/date"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="Original Language"/>
+        android:text="@string/language"/>
 
     <TextView
         android:id="@+id/lang"
@@ -76,7 +76,7 @@
         style="@style/TextDetail.Title"
         app:layout_constraintTop_toBottomOf="@id/lang"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="Runtime"/>
+        android:text="@string/runtime"/>
 
     <TextView
         android:id="@+id/runtime"
@@ -92,7 +92,7 @@
         style="@style/TextDetail.Title"
         app:layout_constraintTop_toBottomOf="@id/runtime"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="Budget"/>
+        android:text="@string/budget"/>
 
     <TextView
         android:id="@+id/budget"
@@ -108,7 +108,7 @@
         style="@style/TextDetail.Title"
         app:layout_constraintTop_toBottomOf="@id/budget"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="Revenue"/>
+        android:text="@string/revenue"/>
 
     <TextView
         android:id="@+id/revenue"
