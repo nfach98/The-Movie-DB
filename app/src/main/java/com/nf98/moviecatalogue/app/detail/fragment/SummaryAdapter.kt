@@ -48,8 +48,8 @@ class SummaryAdapter: RecyclerView.Adapter<SummaryAdapter.CreditViewHolder>() {
         fun bind(item: Credit){
             with(itemView){
                 val options = RequestOptions()
-                    .placeholder(R.drawable.img_poster_na)
-                    .error(R.drawable.img_poster_na)
+                    .placeholder(R.drawable.img_actor_na)
+                    .error(R.drawable.img_actor_na)
 
                 when(type){
                     TYPE_CAST -> {

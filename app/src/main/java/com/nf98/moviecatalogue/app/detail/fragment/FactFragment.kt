@@ -1,6 +1,5 @@
 package com.nf98.moviecatalogue.app.detail.fragment
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +13,7 @@ import com.nf98.moviecatalogue.app.detail.DetailActivity
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import kotlinx.android.synthetic.main.fragment_detail_fact.*
 import java.text.DateFormat
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -46,19 +46,19 @@ class FactFragment : Fragment() {
                 budget.visibility = View.VISIBLE
                 revenue.visibility = View.VISIBLE
 
-                genre.text = getGenre(movie.genres)
+                setGenre(movie.genres)
                 status.text = movie.status
                 setDate(movie.releaseDate)
-                lang.text = movie.originalLanguage
+                setLanguage(movie.originalLanguage)
                 runtime.text = getDuration(movie.duration)
-                budget.text = if(movie.budget > 0) movie.budget.toString() else "-"
-                revenue.text = if(movie.budget > 0) movie.revenue.toString() else "-"
+                budget.text = if(movie.budget > 0) getCurrency(movie.budget) else "-"
+                revenue.text = if(movie.budget > 0) getCurrency(movie.revenue) else "-"
             }
             DetailPagerAdapter.TYPE_TV -> {
-                genre.text = getGenre(tvShow.genres)
+                setGenre(tvShow.genres)
                 status.text = tvShow.status
                 setDate(tvShow.firstAirDate)
-                lang.text = tvShow.originalLanguage
+                setLanguage(tvShow.originalLanguage)
                 runtime.text = getEpisodeDuration(tvShow.duration)
                 tvBudget.visibility = View.GONE
                 budget.visibility = View.GONE
@@ -74,14 +74,29 @@ class FactFragment : Fragment() {
         date.text = format.format(parser.parse(input))
     }
 
-    private fun getGenre(genres: List<Genre>?): String {
+    private fun setLanguage(input: String?){
+        for(item in Locale.getAvailableLocales()){
+            if(item.language == input)
+                lang.text = item.displayLanguage
+        }
+    }
+
+    private fun setGenre(genres: List<Genre>?) {
         var res = ""
         if (genres != null) {
             for(item in genres)
                 res = res.plus(if (item == genres[genres.lastIndex]) item.name else "${item.name}, ")
         }
+        genre.text = res
+    }
 
-        return res
+    private fun getCurrency(input: Int): String{
+        val format = NumberFormat.getCurrencyInstance()
+        format.apply {
+            maximumFractionDigits = 0
+            currency = Currency.getInstance(Locale.US)
+        }
+        return format.format(input)
     }
 
     private fun getEpisodeDuration(times: List<Int>?): String {
@@ -90,7 +105,6 @@ class FactFragment : Fragment() {
             for(item in times)
                 res = res.plus(if (item == times[times.lastIndex]) getDuration(item) else "${getDuration(item)}, ")
         }
-
         return res
     }
 
