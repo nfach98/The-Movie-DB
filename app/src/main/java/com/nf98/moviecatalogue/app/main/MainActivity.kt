@@ -3,8 +3,6 @@ package com.nf98.moviecatalogue.app.main
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment.findNavController
