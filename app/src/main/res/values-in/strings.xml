@@ -2,6 +2,7 @@
     <string name="movies">Film</string>
     <string name="tv_shows">Acara TV</string>
     <string name="discover">Temukan</string>
+    <string name="fav">Favorit</string>
 
     <string name="year">Tahun</string>
     <string name="sort_by">Urut berdasarkan</string>

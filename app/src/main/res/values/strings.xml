@@ -6,6 +6,7 @@
     <string name="movies">Movies</string>
     <string name="tv_shows">TV Shows</string>
     <string name="discover">Discover</string>
+    <string name="fav">Favorite</string>
 
     <string name="year">Year</string>
     <string name="sort_by">Sort by</string>

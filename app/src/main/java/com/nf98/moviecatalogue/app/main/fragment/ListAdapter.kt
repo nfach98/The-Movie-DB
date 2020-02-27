@@ -124,7 +124,7 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
         override fun bind(item: TVShow) {
             with(itemView) {
                 Glide.with(this)
-                    .load("https://image.tmdb.org/t/p/w154${item.posterPath}")
+                    .load("https://image.tmdb.org/t/p/w185${item.posterPath}")
                     .into(iv_poster)
 
                 tv_name.text = item.name
