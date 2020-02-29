@@ -40,7 +40,7 @@
         app:donut_finished_stroke_width="5dp"
         app:donut_circle_starting_degree="270"
         app:donut_text_size="16sp"
-        app:donut_text_color="@android:color/white" />
+        app:donut_text_color="@android:color/white"/>
 
     <TextView
         android:id="@+id/tv_name"

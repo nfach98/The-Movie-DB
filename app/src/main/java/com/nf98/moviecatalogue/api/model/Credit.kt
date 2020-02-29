@@ -1,8 +1,11 @@
 package com.nf98.moviecatalogue.api.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 class Credit (
     @SerializedName("cast_id")
     @Expose
@@ -36,11 +39,7 @@ class Credit (
     @Expose
     var name: String? = null,
 
-    @SerializedName("order")
-    @Expose
-    var order: Int = 0,
-
     @SerializedName("profile_path")
     @Expose
     var profilePath: String? = null
-)
+) : Parcelable

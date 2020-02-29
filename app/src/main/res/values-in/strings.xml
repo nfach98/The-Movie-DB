@@ -51,4 +51,6 @@
     <string name="title_desc">Judul ↓</string>
     <string name="title_asc">Judul ↑</string>
 
+    <string name="added_to_fav">Ditambahkan Ke Favorit</string>
+
 </resources>

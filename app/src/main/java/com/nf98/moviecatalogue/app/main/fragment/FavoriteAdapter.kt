@@ -1,5 +1,7 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
+import android.app.Activity
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,26 +13,31 @@ import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 import kotlinx.android.synthetic.main.item_list.view.*
+import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
+class FavoriteAdapter(private val type: Int, private val activity: Activity): RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>() {
 
     companion object {
         const val TYPE_MOVIE = 0
         const val TYPE_TV = 1
     }
 
-    private val list = ArrayList<Any>()
     private var onItemClickCallback: OnItemClickCallback? = null
 
-    fun setData(items: ArrayList<*>) {
-        list.clear()
-        list.addAll(items)
+    var movieList = ArrayList<Movie>()
+        set(movieList) {
+        if (movieList.size > 0) {
+            this.movieList.clear()
+        }
+        this.movieList.addAll(movieList)
         notifyDataSetChanged()
     }
+
+    var tvList = ArrayList<TVShow>()
 
     fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
         this.onItemClickCallback = onItemClickCallback
@@ -39,7 +46,7 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder<*> {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_list, parent, false)
 
-        return when(viewType) {
+        return when(type) {
             TYPE_MOVIE -> MovieViewHolder(view)
             TYPE_TV -> TVShowViewHolder(view)
             else -> throw IllegalArgumentException("Invalid view type")
@@ -48,20 +55,18 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
 
     override fun onBindViewHolder(holder: ItemViewHolder<*>, position: Int) {
         when (holder) {
-            is MovieViewHolder -> holder.bind(list[position] as Movie)
-            is TVShowViewHolder -> holder.bind(list[position] as TVShow)
+            is MovieViewHolder -> holder.bind(movieList[position])
+            is TVShowViewHolder -> holder.bind(tvList[position])
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return when (list[position]) {
-            is Movie -> TYPE_MOVIE
-            is TVShow -> TYPE_TV
-            else -> throw IllegalArgumentException("Invalid type of data $position")
+    override fun getItemCount(): Int {
+        return when(type) {
+            TYPE_MOVIE -> movieList.size
+            TYPE_TV -> tvList.size
+            else -> throw IllegalArgumentException("Invalid")
         }
     }
-
-    override fun getItemCount(): Int = list.size
 
 
     abstract class ItemViewHolder<T>(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -75,17 +80,17 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
                     .placeholder(R.drawable.img_poster_na)
                     .error(R.drawable.img_poster_na)
 
-                    Glide.with(this)
-                        .load("https://image.tmdb.org/t/p/w154${item.posterPath}")
-                        .apply(options)
-                        .into(iv_poster)
+                Glide.with(this)
+                    .load(Uri.fromFile(File(item.posterPath)))
+                    .apply(options)
+                    .into(iv_poster)
 
-                    tv_name.text = getTitle(item.originalLanguage, item.originalTitle, item.title)
-                    tv_desc.text = item.overview
-                    tv_date.text = getDate(item.releaseDate)
-                    setDonut(item.score)
+                tv_name.text = getTitle(item.originalLanguage, item.originalTitle, item.title)
+                tv_desc.text = item.overview
+                tv_date.text = getDate(item.releaseDate)
+                setDonut(item.score)
 
-                    itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
+                itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
             }
         }
 
@@ -112,27 +117,35 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
         }
 
         private fun getDate(input: String?): String {
-            val parser = SimpleDateFormat("yyyy-MM-dd")
+            val parser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val format = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault())
             return format.format(parser.parse(input))
         }
-
     }
 
     inner class TVShowViewHolder(itemView: View): ItemViewHolder<TVShow>(itemView) {
         override fun bind(item: TVShow) {
             with(itemView) {
+                val options = RequestOptions()
+                    .placeholder(R.drawable.img_poster_na)
+                    .error(R.drawable.img_poster_na)
+
                 Glide.with(this)
-                    .load("https://image.tmdb.org/t/p/w185${item.posterPath}")
+                    .load(Uri.fromFile(File(item.posterPath)))
+                    .apply(options)
                     .into(iv_poster)
 
-                tv_name.text = item.name
+                tv_name.text = getTitle(item.originalLanguage, item.originalName, item.name)
                 tv_desc.text = item.overview
-                item.firstAirDate?.let { setDate(it) }
+                tv_date.text = getDate(item.firstAirDate)
                 setDonut(item.score)
 
                 itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
             }
+        }
+
+        private fun getTitle(lang: String?, oriTitle: String?, intTitle: String?): String?{
+            return if(Locale.getDefault().language == lang) oriTitle else intTitle
         }
 
         private fun setDonut(input: Float){
@@ -144,29 +157,20 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
                 else donut_score.text = "NR"
 
                 when (score) {
-                    in Int.MIN_VALUE..39 -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutRed)
-                    in 40..59 -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutOrange)
-                    in 60..69 -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutYellow)
-                    in 70..79 -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutLime)
-                    in 80..Int.MAX_VALUE -> donut_score.finishedStrokeColor =
-                        ContextCompat.getColor(context, R.color.donutGreen)
+                    in Int.MIN_VALUE..39 -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutRed)
+                    in 40..59 -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutOrange)
+                    in 60..69 -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutYellow)
+                    in 70..79 -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutLime)
+                    in 80..Int.MAX_VALUE -> donut_score.finishedStrokeColor = ContextCompat.getColor(context, R.color.donutGreen)
                 }
             }
         }
 
-        private fun setDate(input: String) {
-            val parser = SimpleDateFormat("yyyy-MM-dd")
+        private fun getDate(input: String?): String {
+            val parser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val format = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault())
-
-            with(itemView) {
-                tv_date.text = format.format(parser.parse(input))
-            }
+            return format.format(parser.parse(input))
         }
-
     }
 
     interface OnItemClickCallback {

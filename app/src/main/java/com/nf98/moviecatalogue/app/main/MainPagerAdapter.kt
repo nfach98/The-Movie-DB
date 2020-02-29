@@ -15,6 +15,7 @@ class MainPagerAdapter(private val context: Context?, fm: FragmentManager, priva
         const val TYPE_MOVIE = 0
         const val TYPE_TV = 1
         const val TYPE_DISCOVER = 2
+        const val TYPE_FAVORITE = 3
     }
 
     @StringRes
@@ -25,6 +26,7 @@ class MainPagerAdapter(private val context: Context?, fm: FragmentManager, priva
             TYPE_MOVIE -> TITLES = intArrayOf(R.string.popular, R.string.top_rated, R.string.upcoming, R.string.now_playing)
             TYPE_TV -> TITLES = intArrayOf(R.string.popular, R.string.top_rated, R.string.on_tv, R.string.airing_today)
             TYPE_DISCOVER -> TITLES = intArrayOf(R.string.movies, R.string.tv_shows)
+            TYPE_FAVORITE -> TITLES = intArrayOf(R.string.movies, R.string.tv_shows)
         }
     }
 
@@ -33,6 +35,7 @@ class MainPagerAdapter(private val context: Context?, fm: FragmentManager, priva
             TYPE_MOVIE -> ListFragment.newInstance(position)
             TYPE_TV -> ListFragment.newInstance(position + 4)
             TYPE_DISCOVER -> ListFragment.newInstance(position + 8)
+            TYPE_FAVORITE -> ListFragment.newInstance(position + 10)
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }

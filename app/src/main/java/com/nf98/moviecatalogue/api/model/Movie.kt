@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.parcel.RawValue
 
+@Parcelize
 data class Movie(
     @SerializedName("popularity")
     @Expose
@@ -49,7 +50,7 @@ data class Movie(
 
     @SerializedName("genres")
     @Expose
-    var genres : List<Genre>? = null,
+    var genres : @RawValue List<Genre>? = null,
 
     @SerializedName("title")
     @Expose
@@ -77,5 +78,4 @@ data class Movie(
 
     @SerializedName("release_date")
     @Expose
-    var releaseDate: String? = null
-)
+    var releaseDate: String? = null) : Parcelable

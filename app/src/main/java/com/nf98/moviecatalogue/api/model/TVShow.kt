@@ -1,8 +1,12 @@
 package com.nf98.moviecatalogue.api.model
 
+import android.os.Parcelable
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
+import kotlinx.android.parcel.RawValue
 
+@Parcelize
 data class TVShow (
     @SerializedName("episode_run_time")
     @Expose
@@ -14,7 +18,7 @@ data class TVShow (
 
     @SerializedName("genres")
     @Expose
-    var genres : List<Genre>? = null,
+    var genres : @RawValue List<Genre>? = null,
 
     @SerializedName("genre_ids")
     @Expose
@@ -26,7 +30,7 @@ data class TVShow (
 
     @SerializedName("seasons")
     @Expose
-    var seasons : List<Season>? = null,
+    var seasons : @RawValue List<Season>? = null,
 
     @SerializedName("name")
     @Expose
@@ -74,4 +78,5 @@ data class TVShow (
 
     @SerializedName("status")
     @Expose
-    var status : String? = null)
+    var status : String? = null
+) : Parcelable

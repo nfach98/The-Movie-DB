@@ -16,12 +16,24 @@ import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import com.nf98.moviecatalogue.app.main.*
+import com.nf98.moviecatalogue.db.MovieHelper
+import com.nf98.moviecatalogue.db.TVShowHelper
+import com.nf98.moviecatalogue.helper.MappingHelper
 import kotlinx.android.synthetic.main.fragment_list.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class ListFragment : Fragment() {
 
+    private var movieHelper: MovieHelper? = null
+    private var tvShowHelper: TVShowHelper? = null
+
     private lateinit var mainViewModel: MainViewModel
     private var index = 0
+
+    private lateinit var favAdapter: FavoriteAdapter
 
     companion object {
         private const val ARG_SECTION_NUMBER = "section_number"
@@ -68,7 +80,14 @@ class ListFragment : Fragment() {
             }
             8 -> updateDiscover(MainPagerAdapter.TYPE_MOVIE)
             9 -> updateDiscover(MainPagerAdapter.TYPE_TV)
+            10 -> updateFavorite(MainPagerAdapter.TYPE_MOVIE)
+            11 -> updateFavorite(MainPagerAdapter.TYPE_TV)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+//        outState.putParcelableArrayList("extra_state", favAdapter.movieList)
     }
 
     private fun refreshList(it: ArrayList<*>) {
@@ -102,6 +121,48 @@ class ListFragment : Fragment() {
                     .observe(this, Observer {
                         if (it != null) { refreshList(it) }
                     })
+            }
+        }
+    }
+
+    private fun updateFavorite(type: Int){
+        tableDisc.visibility = View.GONE
+        when(type){
+            MainPagerAdapter.TYPE_MOVIE -> {
+                movieHelper = activity?.applicationContext?.let { MovieHelper.getInstance(it) }
+                movieHelper?.open()
+                val adapter = activity?.let { FavoriteAdapter(type, it) }
+                rvList.adapter = adapter
+
+                GlobalScope.launch(Dispatchers.Main) {
+                    listProg.visibility = View.VISIBLE
+                    val deferredMovies = async(Dispatchers.IO) {
+                        val cursor = movieHelper?.queryAll()
+                        MappingHelper.mapMovieCursorToArrayList(cursor)
+                    }
+                    listProg.visibility = View.INVISIBLE
+                    val movies = deferredMovies.await()
+                    if (movies.size > 0) adapter?.movieList = movies
+                    else adapter?.movieList = ArrayList()
+                }
+            }
+            MainPagerAdapter.TYPE_TV -> {
+                tvShowHelper = activity?.applicationContext?.let { TVShowHelper.getInstance(it) }
+                tvShowHelper?.open()
+                val adapter = activity?.let { FavoriteAdapter(type, it) }
+                rvList.adapter = adapter
+
+                GlobalScope.launch(Dispatchers.Main) {
+                    listProg.visibility = View.VISIBLE
+                    val deferredTVShows = async(Dispatchers.IO) {
+                        val cursor = tvShowHelper?.queryAll()
+                        MappingHelper.mapTVShowCursorToArrayList(cursor)
+                    }
+                    listProg.visibility = View.INVISIBLE
+                    val tvShows = deferredTVShows.await()
+                    if (tvShows.size > 0) adapter?.tvList = tvShows
+                    else adapter?.tvList = ArrayList()
+                }
             }
         }
     }

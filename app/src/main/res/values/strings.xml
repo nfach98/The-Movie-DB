@@ -76,4 +76,6 @@
         <item>@string/rel_date_asc</item>
     </string-array>
 
+    <string name="added_to_fav">Added To Favorite</string>
+
 </resources>
