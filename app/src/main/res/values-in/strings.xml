@@ -4,6 +4,8 @@
     <string name="discover">Temukan</string>
     <string name="fav">Favorit</string>
 
+    <string name="delete">Hapus</string>
+
     <string name="year">Tahun</string>
     <string name="sort_by">Urut berdasarkan</string>
 
@@ -51,6 +53,7 @@
     <string name="title_desc">Judul ↓</string>
     <string name="title_asc">Judul ↑</string>
 
-    <string name="added_to_fav">Ditambahkan Ke Favorit</string>
+    <string name="added_to_fav">Ditambahkan ke Favorit</string>
+    <string name="del_from_fav">Dihapus dari Favorit</string>
 
 </resources>

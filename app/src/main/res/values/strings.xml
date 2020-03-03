@@ -8,6 +8,8 @@
     <string name="discover">Discover</string>
     <string name="fav">Favorite</string>
 
+    <string name="delete">Delete</string>
+
     <string name="year">Year</string>
     <string name="sort_by">Sort by</string>
 
@@ -76,6 +78,7 @@
         <item>@string/rel_date_asc</item>
     </string-array>
 
-    <string name="added_to_fav">Added To Favorite</string>
+    <string name="added_to_fav">Added to Favorite</string>
+    <string name="del_from_fav">Deleted from Favorite</string>
 
 </resources>

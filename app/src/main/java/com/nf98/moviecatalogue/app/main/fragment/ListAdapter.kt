@@ -10,7 +10,13 @@ import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
+import kotlinx.android.synthetic.main.item_fav.view.*
 import kotlinx.android.synthetic.main.item_list.view.*
+import kotlinx.android.synthetic.main.item_list.view.donut_score
+import kotlinx.android.synthetic.main.item_list.view.iv_poster
+import kotlinx.android.synthetic.main.item_list.view.tv_date
+import kotlinx.android.synthetic.main.item_list.view.tv_desc
+import kotlinx.android.synthetic.main.item_list.view.tv_name
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -75,17 +81,17 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
                     .placeholder(R.drawable.img_poster_na)
                     .error(R.drawable.img_poster_na)
 
-                    Glide.with(this)
-                        .load("https://image.tmdb.org/t/p/w154${item.posterPath}")
-                        .apply(options)
-                        .into(iv_poster)
+                Glide.with(this)
+                    .load("https://image.tmdb.org/t/p/w154${item.posterPath}")
+                    .apply(options)
+                    .into(iv_poster)
 
-                    tv_name.text = getTitle(item.originalLanguage, item.originalTitle, item.title)
-                    tv_desc.text = item.overview
-                    tv_date.text = getDate(item.releaseDate)
-                    setDonut(item.score)
+                tv_name.text = getTitle(item.originalLanguage, item.originalTitle, item.title)
+                tv_desc.text = item.overview
+                tv_date.text = getDate(item.releaseDate)
+                setDonut(item.score)
 
-                    itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
+                itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
             }
         }
 

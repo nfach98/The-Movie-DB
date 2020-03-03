@@ -19,14 +19,15 @@ class ImageDownloader(context: Context, private val child: String, private val n
 
     override fun doInBackground(vararg params: String?) {
         val url = params[0]
-        /*val requestOptions =
-            RequestOptions().downsample(DownsampleStrategy.CENTER_INSIDE)
+        val requestOptions = RequestOptions()
+            .downsample(DownsampleStrategy.CENTER_INSIDE)
             .skipMemoryCache(true)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)*/
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
 
         mContext.get()?.let {
             val bitmap = Glide.with(it)
                 .asBitmap()
+                .apply(requestOptions)
                 .load(url)
                 .submit()
                 .get()

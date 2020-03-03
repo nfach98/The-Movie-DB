@@ -11,26 +11,21 @@ import com.nf98.moviecatalogue.db.DatabaseContract.TVShowColumns.Companion.TABLE
 
 class TVShowHelper(context: Context) {
 
-    private var tvDataBaseHelper: TVShowDatabaseHelper = TVShowDatabaseHelper(context)
+    private var databaseHelper: DatabaseHelper = DatabaseHelper(context)
     private lateinit var database: SQLiteDatabase
 
     companion object {
         private const val DATABASE_TABLE = TABLE_NAME
         private var INSTANCE: TVShowHelper? = null
 
-        fun getInstance(context: Context): TVShowHelper =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: TVShowHelper(context)
-            }
+        fun getInstance(context: Context): TVShowHelper = INSTANCE ?: synchronized(this) { INSTANCE ?: TVShowHelper(context) }
     }
 
     @Throws(SQLException::class)
-    fun open() {
-        database = tvDataBaseHelper.writableDatabase
-    }
+    fun open() { database = databaseHelper.writableDatabase }
 
     fun close() {
-        tvDataBaseHelper.close()
+        databaseHelper.close()
 
         if (database.isOpen)
             database.close()
@@ -60,7 +55,7 @@ class TVShowHelper(context: Context) {
         return database.update(DATABASE_TABLE, values, "$ID = ?", arrayOf(id))
     }
 
-    fun deleteById(id: String): Int {
-        return database.delete(DATABASE_TABLE, "$ID = '$id'", null)
+    fun deleteById(id: Int): Int {
+        return database.delete(DATABASE_TABLE, "$ID = $id", null)
     }
 }

@@ -57,5 +57,13 @@
             android:name="type"
             app:argType="integer"
             android:defaultValue="0" />
+        <argument
+            android:name="movie"
+            app:argType="com.nf98.moviecatalogue.api.model.Movie"
+            app:nullable="true" />
+        <argument
+            android:name="tvShow"
+            app:argType="com.nf98.moviecatalogue.api.model.TVShow"
+            app:nullable="true" />
     </activity>
 </navigation>

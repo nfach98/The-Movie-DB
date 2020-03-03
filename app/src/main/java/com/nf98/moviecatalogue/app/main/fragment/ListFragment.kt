@@ -15,7 +15,8 @@ import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
-import com.nf98.moviecatalogue.app.main.*
+import com.nf98.moviecatalogue.app.main.MainPagerAdapter
+import com.nf98.moviecatalogue.app.main.MainViewModel
 import com.nf98.moviecatalogue.db.MovieHelper
 import com.nf98.moviecatalogue.db.TVShowHelper
 import com.nf98.moviecatalogue.helper.MappingHelper
@@ -39,8 +40,7 @@ class ListFragment : Fragment() {
         private const val ARG_SECTION_NUMBER = "section_number"
 
         fun newInstance(index: Int): ListFragment {
-            val fragment =
-                ListFragment()
+            val fragment = ListFragment()
             val bundle = Bundle()
             bundle.putInt(ARG_SECTION_NUMBER, index)
             fragment.arguments = bundle
@@ -90,6 +90,12 @@ class ListFragment : Fragment() {
 //        outState.putParcelableArrayList("extra_state", favAdapter.movieList)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        movieHelper?.close()
+        tvShowHelper?.close()
+    }
+
     private fun refreshList(it: ArrayList<*>) {
         val adapter = ListAdapter()
         adapter.notifyDataSetChanged()
@@ -131,7 +137,7 @@ class ListFragment : Fragment() {
             MainPagerAdapter.TYPE_MOVIE -> {
                 movieHelper = activity?.applicationContext?.let { MovieHelper.getInstance(it) }
                 movieHelper?.open()
-                val adapter = activity?.let { FavoriteAdapter(type, it) }
+                val adapter = FavoriteAdapter(type)
                 rvList.adapter = adapter
 
                 GlobalScope.launch(Dispatchers.Main) {
@@ -142,14 +148,27 @@ class ListFragment : Fragment() {
                     }
                     listProg.visibility = View.INVISIBLE
                     val movies = deferredMovies.await()
-                    if (movies.size > 0) adapter?.movieList = movies
-                    else adapter?.movieList = ArrayList()
+                    if (movies.size > 0) adapter.movieList = movies
+                    else adapter.movieList = ArrayList()
                 }
+
+                adapter.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                    override fun onItemClicked(data: Any) {
+                        toDetail(MainPagerAdapter.TYPE_FAVORITE, data)
+                    }
+                })
+
+                adapter.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                    override fun onItemClicked(data: Any) {
+                        movieHelper?.deleteById((data as Movie).id)
+                        adapter.removeItem(data, 0)
+                    }
+                })
             }
             MainPagerAdapter.TYPE_TV -> {
                 tvShowHelper = activity?.applicationContext?.let { TVShowHelper.getInstance(it) }
                 tvShowHelper?.open()
-                val adapter = activity?.let { FavoriteAdapter(type, it) }
+                val adapter = FavoriteAdapter(type)
                 rvList.adapter = adapter
 
                 GlobalScope.launch(Dispatchers.Main) {
@@ -160,9 +179,22 @@ class ListFragment : Fragment() {
                     }
                     listProg.visibility = View.INVISIBLE
                     val tvShows = deferredTVShows.await()
-                    if (tvShows.size > 0) adapter?.tvList = tvShows
-                    else adapter?.tvList = ArrayList()
+                    if (tvShows.size > 0) adapter.tvList = tvShows
+                    else adapter.tvList = ArrayList()
                 }
+
+                adapter.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                    override fun onItemClicked(data: Any) {
+                        toDetail(MainPagerAdapter.TYPE_FAVORITE, data)
+                    }
+                })
+
+                adapter.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                    override fun onItemClicked(data: Any) {
+                        tvShowHelper?.deleteById((data as TVShow).id)
+                        adapter.removeItem(data, 1)
+                    }
+                })
             }
         }
     }
@@ -170,22 +202,38 @@ class ListFragment : Fragment() {
     private fun toDetail(type: Int, data: Any) {
         when(type) {
             MainPagerAdapter.TYPE_MOVIE -> {
-                val direction = MovieFragmentDirections.actionNavMovieToDetailActivity()
+                val direction = MovieFragmentDirections.actionNavMovieToDetailActivity(null, null)
                 direction.id = (data as Movie).id
                 direction.type = DetailPagerAdapter.TYPE_MOVIE
                 view?.findNavController()?.navigate(direction)
             }
             MainPagerAdapter.TYPE_TV -> {
-                val direction = TVShowFragmentDirections.actionNavTvShowToDetailActivity()
+                val direction = TVShowFragmentDirections.actionNavTvShowToDetailActivity(null, null)
                 direction.id = (data as TVShow).id
                 direction.type = DetailPagerAdapter.TYPE_TV
                 view?.findNavController()?.navigate(direction)
             }
             MainPagerAdapter.TYPE_DISCOVER -> {
-                val direction = DiscoverFragmentDirections.actionNavDiscoverToDetailActivity()
+                val direction = DiscoverFragmentDirections.actionNavDiscoverToDetailActivity(null, null)
                 direction.id = if(index == 8) (data as Movie).id else (data as TVShow).id
                 direction.type = if(index == 8) DetailPagerAdapter.TYPE_MOVIE else DetailPagerAdapter.TYPE_TV
                 view?.findNavController()?.navigate(direction)
+            }
+            MainPagerAdapter.TYPE_FAVORITE -> {
+                var direction : FavoriteFragmentDirections.ActionNavFavoriteToDetailActivity? = null
+                when(index){
+                    10 -> {
+                        direction = FavoriteFragmentDirections.actionNavFavoriteToDetailActivity(data as Movie, null)
+                        direction.id = data.id
+                        direction.type = DetailPagerAdapter.TYPE_MOVIE
+                    }
+                    11 -> {
+                        direction = FavoriteFragmentDirections.actionNavFavoriteToDetailActivity(null, data as TVShow)
+                        direction.id = data.id
+                        direction.type = DetailPagerAdapter.TYPE_TV
+                    }
+                }
+                direction?.let { view?.findNavController()?.navigate(it) }
             }
         }
     }

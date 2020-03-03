@@ -2,6 +2,7 @@ package com.nf98.moviecatalogue.app.detail
 
 import android.content.ContentValues
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -61,6 +62,8 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
         type = arguments.type
 
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(DetailViewModel::class.java)
+
+        Log.d("MovieDB", type.toString())
 
         when(type){
             DetailPagerAdapter.TYPE_MOVIE -> {
@@ -185,11 +188,11 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
         if(!isFavorite()) {
             when(type){
                 DetailPagerAdapter.TYPE_MOVIE -> {
-                    val poster = ImageDownloader(applicationContext, "movie", "${movie.id}_poster_mov")
-                    poster.execute("https://image.tmdb.org/t/p/w185${movie.posterPath}")
+                    val poster = ImageDownloader(this, "movie", "${movie.id}_poster")
+                    movie.posterPath?.let { poster.execute("https://image.tmdb.org/t/p/w185${movie.posterPath}") }
 
-                    val backdrop = ImageDownloader(applicationContext, "movie", "${movie.id}_backdrop_mov")
-                    backdrop.execute("https://image.tmdb.org/t/p/original${movie.backdropPath}")
+                    val backdrop = ImageDownloader(this, "movie", "${movie.id}_backdrop")
+                    movie.backdropPath?.let{ backdrop.execute("https://image.tmdb.org/t/p/original${movie.backdropPath}") }
 
                     val values = ContentValues()
                     values.put(DatabaseContract.MovieColumns.TITLE, movie.title)
@@ -202,11 +205,11 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
                     status = movieHelper.insert(values)
                 }
                 DetailPagerAdapter.TYPE_TV -> {
-                    val poster = ImageDownloader(applicationContext, "tv", "${tvShow.id}_poster_tv")
-                    poster.execute("https://image.tmdb.org/t/p/w185${tvShow.posterPath}")
+                    val poster = ImageDownloader(applicationContext, "tv", "${tvShow.id}_poster")
+                    tvShow.posterPath?.let { poster.execute("https://image.tmdb.org/t/p/w185${tvShow.posterPath}") }
 
-                    val backdrop = ImageDownloader(applicationContext, "tv", "${tvShow.id}_backdrop_tv")
-                    backdrop.execute("https://image.tmdb.org/t/p/original${tvShow.backdropPath}")
+                    val backdrop = ImageDownloader(applicationContext, "tv", "${tvShow.id}_backdrop")
+                    tvShow.backdropPath?.let { backdrop.execute("https://image.tmdb.org/t/p/original${tvShow.backdropPath}") }
 
                     val values = ContentValues()
                     values.put(DatabaseContract.TVShowColumns.NAME, tvShow.name)
@@ -217,6 +220,16 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
                     values.put(DatabaseContract.TVShowColumns.BACKDROP_PATH, backdrop.path)
                     values.put(DatabaseContract.TVShowColumns.ID, tvShow.id)
                     status = tvShowHelper.insert(values)
+                }
+            }
+        }
+        else{
+            when(type){
+                DetailPagerAdapter.TYPE_MOVIE -> {
+                    status = movieHelper.deleteById(movie.id).toLong()
+                }
+                DetailPagerAdapter.TYPE_TV -> {
+                    status = tvShowHelper.deleteById(tvShow.id).toLong()
                 }
             }
         }
@@ -269,6 +282,7 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
             val result = addToFavorite()
             if (result != null && result > 0)
                 Toast.makeText(this@DetailActivity, resources.getString(R.string.added_to_fav), Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this@DetailActivity, resources.getString(R.string.del_from_fav), Toast.LENGTH_SHORT).show()
         }
     }
 

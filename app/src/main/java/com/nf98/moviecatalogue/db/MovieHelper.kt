@@ -11,17 +11,14 @@ import com.nf98.moviecatalogue.db.DatabaseContract.MovieColumns.Companion.TABLE_
 
 class MovieHelper(context: Context) {
 
-    private var movieDataBaseHelper: MovieDatabaseHelper = MovieDatabaseHelper(context)
+    private var movieDataBaseHelper: DatabaseHelper = DatabaseHelper(context)
     private lateinit var database: SQLiteDatabase
 
     companion object {
         private const val DATABASE_TABLE = TABLE_NAME
         private var INSTANCE: MovieHelper? = null
 
-        fun getInstance(context: Context): MovieHelper =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: MovieHelper(context)
-            }
+        fun getInstance(context: Context): MovieHelper = INSTANCE ?: synchronized(this) { INSTANCE ?: MovieHelper(context) }
     }
 
     @Throws(SQLException::class)
@@ -60,7 +57,7 @@ class MovieHelper(context: Context) {
         return database.update(DATABASE_TABLE, values, "$ID = ?", arrayOf(id))
     }
 
-    fun deleteById(id: String): Int {
-        return database.delete(DATABASE_TABLE, "$ID = '$id'", null)
+    fun deleteById(id: Int): Int {
+        return database.delete(DATABASE_TABLE, "$ID = $id", null)
     }
 }

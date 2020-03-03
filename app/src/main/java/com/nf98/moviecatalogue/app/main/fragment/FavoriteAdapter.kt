@@ -12,14 +12,19 @@ import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
-import kotlinx.android.synthetic.main.item_list.view.*
+import kotlinx.android.synthetic.main.item_fav.view.*
+import kotlinx.android.synthetic.main.item_list.view.donut_score
+import kotlinx.android.synthetic.main.item_list.view.iv_poster
+import kotlinx.android.synthetic.main.item_list.view.tv_date
+import kotlinx.android.synthetic.main.item_list.view.tv_desc
+import kotlinx.android.synthetic.main.item_list.view.tv_name
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class FavoriteAdapter(private val type: Int, private val activity: Activity): RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>() {
+class FavoriteAdapter(private val type: Int): RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>() {
 
     companion object {
         const val TYPE_MOVIE = 0
@@ -27,24 +32,45 @@ class FavoriteAdapter(private val type: Int, private val activity: Activity): Re
     }
 
     private var onItemClickCallback: OnItemClickCallback? = null
+    private var onItemDeleteCallback: OnItemClickCallback? = null
 
     var movieList = ArrayList<Movie>()
         set(movieList) {
-        if (movieList.size > 0) {
-            this.movieList.clear()
+            if (movieList.size > 0) {
+                this.movieList.clear()
+            }
+            this.movieList.addAll(movieList)
         }
-        this.movieList.addAll(movieList)
-        notifyDataSetChanged()
-    }
 
     var tvList = ArrayList<TVShow>()
+        set(tvList) {
+            if (tvList.size > 0) {
+                this.movieList.clear()
+            }
+            this.tvList.addAll(tvList)
+        }
 
-    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
-        this.onItemClickCallback = onItemClickCallback
+    fun removeItem(data: Any, type: Int) {
+        when(type){
+            0 -> {
+                val position = movieList.indexOf(data as Movie)
+                this.movieList.removeAt(position)
+                notifyItemRemoved(position)
+            }
+            1 -> {
+                val position = tvList.indexOf(data as TVShow)
+                this.tvList.removeAt(position)
+                notifyItemRemoved(position)
+            }
+        }
     }
 
+    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) { this.onItemClickCallback = onItemClickCallback }
+
+    fun setOnDeleteClickCallback(onItemClickCallback: OnItemClickCallback) { this.onItemClickCallback = onItemClickCallback }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder<*> {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_list, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_fav, parent, false)
 
         return when(type) {
             TYPE_MOVIE -> MovieViewHolder(view)
@@ -91,6 +117,7 @@ class FavoriteAdapter(private val type: Int, private val activity: Activity): Re
                 setDonut(item.score)
 
                 itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
+                btn_delete.setOnClickListener { onItemDeleteCallback?.onItemClicked(item) }
             }
         }
 
@@ -141,6 +168,7 @@ class FavoriteAdapter(private val type: Int, private val activity: Activity): Re
                 setDonut(item.score)
 
                 itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
+                btn_delete.setOnClickListener { onItemDeleteCallback?.onItemClicked(item) }
             }
         }
 

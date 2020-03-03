@@ -23,17 +23,17 @@ object MappingHelper {
         return movieList
     }
 
-    fun mapTVShowCursorToArrayList(movieCursor: Cursor?): ArrayList<TVShow> {
+    fun mapTVShowCursorToArrayList(tvShowCursor: Cursor?): ArrayList<TVShow> {
         val tvShowList = ArrayList<TVShow>()
-        movieCursor?.apply {
+        tvShowCursor?.apply {
             while (moveToNext()) {
-                val title = getString(getColumnIndexOrThrow(DatabaseContract.TVShowColumns.NAME))
+                val name = getString(getColumnIndexOrThrow(DatabaseContract.TVShowColumns.NAME))
                 val date = getString(getColumnIndexOrThrow(DatabaseContract.TVShowColumns.FIRST_AIR_DATE))
                 val score = getFloat(getColumnIndexOrThrow(DatabaseContract.TVShowColumns.SCORE))
                 val overview = getString(getColumnIndexOrThrow(DatabaseContract.TVShowColumns.OVERVIEW))
-                val movieId = getInt(getColumnIndexOrThrow(DatabaseContract.TVShowColumns.ID))
+                val tvShowId = getInt(getColumnIndexOrThrow(DatabaseContract.TVShowColumns.ID))
                 val poster = getString(getColumnIndexOrThrow(DatabaseContract.TVShowColumns.POSTER_PATH))
-                tvShowList.add(TVShow(id = movieId, name = title, firstAirDate = date, score = score, overview = overview, posterPath = poster))
+                tvShowList.add(TVShow(id = tvShowId, name = name, firstAirDate = date, score = score, overview = overview, posterPath = poster))
             }
         }
         return tvShowList
