@@ -4,17 +4,20 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.nf98.moviecatalogue.api.ApiMain
 import com.nf98.moviecatalogue.api.model.Credit
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 import com.nf98.moviecatalogue.api.response.CreditsResponse
+import com.nf98.moviecatalogue.database.MovieRepos
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.ArrayList
 
-class DetailViewModel : ViewModel() {
+class DetailViewModel(private val movieRepos: MovieRepos? = null) : ViewModel() {
 
     companion object{
         const val MOVIE = 0
@@ -26,6 +29,20 @@ class DetailViewModel : ViewModel() {
 
     val casts = MutableLiveData<ArrayList<Credit>>()
     val crews = MutableLiveData<ArrayList<Credit>>()
+
+    internal fun getMovieList(): LiveData<List<Movie>>? = movieRepos?.getAllMovie()
+
+    fun insertMovie(movie: Movie){
+        viewModelScope.launch {
+            movieRepos?.insert(movie)
+        }
+    }
+
+    fun deleteMovie(movie: Movie){
+        viewModelScope.launch {
+            movieRepos?.delete(movie)
+        }
+    }
 
     internal fun getMovie(id: Int): LiveData<Movie> {
         val result = ApiMain().services.getMovie(id)

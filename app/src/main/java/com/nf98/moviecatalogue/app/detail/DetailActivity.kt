@@ -1,13 +1,14 @@
 package com.nf98.moviecatalogue.app.detail
 
-import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.navArgs
@@ -16,27 +17,18 @@ import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
-import com.nf98.moviecatalogue.db.DatabaseContract
-import com.nf98.moviecatalogue.db.MovieHelper
-import com.nf98.moviecatalogue.db.TVShowHelper
-import com.nf98.moviecatalogue.helper.ImageDownloader
-import com.nf98.moviecatalogue.helper.MappingHelper
+import com.nf98.moviecatalogue.app.main.MainViewModelFactory
+import com.nf98.moviecatalogue.helper.Inject
 import kotlinx.android.synthetic.main.activity_detail.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DetailActivity : AppCompatActivity(), View.OnClickListener {
-
-    private lateinit var movieHelper: MovieHelper
-    private lateinit var tvShowHelper: TVShowHelper
+class DetailActivity : AppCompatActivity(){
 
     private val arguments: DetailActivityArgs by navArgs()
     lateinit var viewModel: DetailViewModel
+    lateinit var viewModelFactory: MainViewModelFactory
 
     var movie = Movie()
     var tvShow = TVShow()
@@ -54,16 +46,11 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
             title = ""
         }
         showLoading(true)
-
-        prepSQLite()
-        btnFav.setOnClickListener(this)
-
         id = arguments.id
         type = arguments.type
 
-        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(DetailViewModel::class.java)
-
-        Log.d("MovieDB", type.toString())
+        viewModelFactory = Inject.provideViewModelFactory(this)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(DetailViewModel::class.java)
 
         when(type){
             DetailPagerAdapter.TYPE_MOVIE -> {
@@ -85,20 +72,37 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
                 })
             }
         }
+    }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_detail, menu)
+        when {
+            isFavorite() -> menu[0].icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_true_black_24dp)
+            else -> menu[0].icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_false_black_24dp)
+        }
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == android.R.id.home)
-            finish()
+        when(item.itemId) {
+            android.R.id.home -> finish()
+            R.id.menu_fav -> {
+                when {
+                    isFavorite() -> {
+                        deleteFromFavorite()
+                        Toast.makeText(this@DetailActivity, resources.getString(R.string.del_from_fav), Toast.LENGTH_SHORT).show()
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_false_black_24dp)
+                    }
+                    else -> {
+                        addToFavorite()
+                        Toast.makeText(this@DetailActivity, resources.getString(R.string.added_to_fav), Toast.LENGTH_SHORT).show()
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_true_black_24dp)
+                    }
+                }
+            }
+        }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        movieHelper.close()
-        tvShowHelper.close()
     }
 
     private fun bind(){
@@ -139,14 +143,6 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
         showLoading(false)
     }
 
-    private fun prepSQLite(){
-        movieHelper = MovieHelper.getInstance(applicationContext)
-        movieHelper.open()
-
-        tvShowHelper = TVShowHelper.getInstance(applicationContext)
-        tvShowHelper.open()
-    }
-
     private fun setAdapter(type: Int){
         val pagerAdapter = DetailPagerAdapter(this, supportFragmentManager, type)
         pagerDetail.adapter = pagerAdapter
@@ -182,108 +178,57 @@ class DetailActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun showLoading(state: Boolean) { prog.visibility = if(state) View.VISIBLE else View.GONE }
 
-    private fun addToFavorite() : Long? {
-        var status: Long? = null
+    private fun addToFavorite() {
+        when(type){
+            DetailPagerAdapter.TYPE_MOVIE -> viewModel.insertMovie(movie)
+            /*DetailPagerAdapter.TYPE_TV -> {
+                val poster = ImageDownloader(applicationContext, "tv", "${tvShow.id}_poster")
+                tvShow.posterPath?.let { poster.execute("https://image.tmdb.org/t/p/w185${tvShow.posterPath}") }
 
-        if(!isFavorite()) {
-            when(type){
-                DetailPagerAdapter.TYPE_MOVIE -> {
-                    val poster = ImageDownloader(this, "movie", "${movie.id}_poster")
-                    movie.posterPath?.let { poster.execute("https://image.tmdb.org/t/p/w185${movie.posterPath}") }
-
-                    val backdrop = ImageDownloader(this, "movie", "${movie.id}_backdrop")
-                    movie.backdropPath?.let{ backdrop.execute("https://image.tmdb.org/t/p/original${movie.backdropPath}") }
-
-                    val values = ContentValues()
-                    values.put(DatabaseContract.MovieColumns.TITLE, movie.title)
-                    values.put(DatabaseContract.MovieColumns.RELEASE_DATE, movie.releaseDate)
-                    values.put(DatabaseContract.MovieColumns.SCORE, movie.score)
-                    values.put(DatabaseContract.MovieColumns.OVERVIEW, movie.overview)
-                    values.put(DatabaseContract.MovieColumns.POSTER_PATH, poster.path)
-                    values.put(DatabaseContract.MovieColumns.BACKDROP_PATH, backdrop.path)
-                    values.put(DatabaseContract.MovieColumns.ID, movie.id)
-                    status = movieHelper.insert(values)
-                }
-                DetailPagerAdapter.TYPE_TV -> {
-                    val poster = ImageDownloader(applicationContext, "tv", "${tvShow.id}_poster")
-                    tvShow.posterPath?.let { poster.execute("https://image.tmdb.org/t/p/w185${tvShow.posterPath}") }
-
-                    val backdrop = ImageDownloader(applicationContext, "tv", "${tvShow.id}_backdrop")
-                    tvShow.backdropPath?.let { backdrop.execute("https://image.tmdb.org/t/p/original${tvShow.backdropPath}") }
-
-                    val values = ContentValues()
-                    values.put(DatabaseContract.TVShowColumns.NAME, tvShow.name)
-                    values.put(DatabaseContract.TVShowColumns.FIRST_AIR_DATE, tvShow.firstAirDate)
-                    values.put(DatabaseContract.TVShowColumns.SCORE, tvShow.score)
-                    values.put(DatabaseContract.TVShowColumns.OVERVIEW, tvShow.overview)
-                    values.put(DatabaseContract.TVShowColumns.POSTER_PATH, poster.path)
-                    values.put(DatabaseContract.TVShowColumns.BACKDROP_PATH, backdrop.path)
-                    values.put(DatabaseContract.TVShowColumns.ID, tvShow.id)
-                    status = tvShowHelper.insert(values)
-                }
-            }
+                val backdrop = ImageDownloader(applicationContext, "tv", "${tvShow.id}_backdrop")
+                tvShow.backdropPath?.let { backdrop.execute("https://image.tmdb.org/t/p/original${tvShow.backdropPath}") }
+            }*/
         }
-        else{
-            when(type){
-                DetailPagerAdapter.TYPE_MOVIE -> {
-                    status = movieHelper.deleteById(movie.id).toLong()
-                }
-                DetailPagerAdapter.TYPE_TV -> {
-                    status = tvShowHelper.deleteById(tvShow.id).toLong()
-                }
-            }
+    }
+
+    private fun deleteFromFavorite() {
+        when(type){
+            DetailPagerAdapter.TYPE_MOVIE -> viewModel.deleteMovie(movie)
+//            DetailPagerAdapter.TYPE_TV ->
         }
-        return status
     }
 
     private fun isFavorite() : Boolean {
         var result = false
 
-        GlobalScope.launch(Dispatchers.Main) {
-            when(type){
-                DetailPagerAdapter.TYPE_MOVIE -> {
-                    val deferredMovies = async(Dispatchers.IO) {
-                        val cursor = movieHelper.queryAll()
-                        MappingHelper.mapMovieCursorToArrayList(cursor)
-                    }
-                    val list = deferredMovies.await()
-                    if (list.size > 0) {
-                        for(item in list){
-                            if(item.id == movie.id){
+        when(type){
+            DetailPagerAdapter.TYPE_MOVIE -> {
+                viewModel.getMovieList()?.observe(this, Observer<List<Movie>>{
+                    if(it != null) {
+                        for (item in it) {
+                            Log.d("MovieDB", item.title)
+                            if (item.id == id) {
                                 result = true
                                 break
                             }
                         }
                     }
-                }
-                DetailPagerAdapter.TYPE_TV -> {
-                    val deferredTVShows = async(Dispatchers.IO) {
-                        val cursor = tvShowHelper.queryAll()
-                        MappingHelper.mapTVShowCursorToArrayList(cursor)
-                    }
-                    val list = deferredTVShows.await()
-                    if (list.size > 0) {
-                        for(item in list){
-                            if(item.id == tvShow.id){
-                                result = true
-                                break
-                            }
+                })
+            }
+            DetailPagerAdapter.TYPE_TV -> {
+                /*val cursor = tvShowHelper.queryAll()
+                val list = MappingHelper.mapTVShowCursorToArrayList(cursor)
+                if (list.size > 0) {
+                    for(item in list){
+                        if(item.id == id){
+                            result = true
+                            break
                         }
                     }
-                }
+                }*/
             }
         }
 
         return result
     }
-
-    override fun onClick(v: View) {
-        if(v.id == R.id.btnFav){
-            val result = addToFavorite()
-            if (result != null && result > 0)
-                Toast.makeText(this@DetailActivity, resources.getString(R.string.added_to_fav), Toast.LENGTH_SHORT).show()
-//                    Toast.makeText(this@DetailActivity, resources.getString(R.string.del_from_fav), Toast.LENGTH_SHORT).show()
-        }
-    }
-
 }

@@ -5,21 +5,24 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.nf98.moviecatalogue.api.ApiMain
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 import com.nf98.moviecatalogue.api.response.MovieResponse
 import com.nf98.moviecatalogue.api.response.TVShowResponse
+import com.nf98.moviecatalogue.database.MovieRepos
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
+import kotlin.collections.ArrayList
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val movieRepos: MovieRepos? = null) : ViewModel() {
 
     companion object {
-        @SuppressLint("ConstantLocale")
-        val region: String = Locale.getDefault().country
+        @SuppressLint("ConstantLocale")        val region: String = Locale.getDefault().country
 
         const val MOVIE_POPULAR = 0
         const val MOVIE_TOP_RATED = 1
@@ -82,6 +85,14 @@ class MainViewModel : ViewModel() {
             }
         })
         return listMovie
+    }
+
+    fun getMovieList(): LiveData<List<Movie>>? = movieRepos?.getAllMovie()
+
+    fun deleteMovie(movie: Movie){
+        viewModelScope.launch {
+            movieRepos?.delete(movie)
+        }
     }
 
     @JvmOverloads

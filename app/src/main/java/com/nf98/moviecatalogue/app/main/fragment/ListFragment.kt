@@ -1,6 +1,7 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,21 +18,14 @@ import com.nf98.moviecatalogue.api.model.TVShow
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainViewModel
-import com.nf98.moviecatalogue.db.MovieHelper
-import com.nf98.moviecatalogue.db.TVShowHelper
-import com.nf98.moviecatalogue.helper.MappingHelper
+import com.nf98.moviecatalogue.app.main.MainViewModelFactory
+import com.nf98.moviecatalogue.helper.Inject
 import kotlinx.android.synthetic.main.fragment_list.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 
 class ListFragment : Fragment() {
 
-    private var movieHelper: MovieHelper? = null
-    private var tvShowHelper: TVShowHelper? = null
-
-    private lateinit var mainViewModel: MainViewModel
+    private lateinit var viewModelFactory: MainViewModelFactory
+    private lateinit var viewModel: MainViewModel
     private var index = 0
 
     private lateinit var favAdapter: FavoriteAdapter
@@ -57,7 +51,8 @@ class ListFragment : Fragment() {
 
         index = arguments?.getInt(ARG_SECTION_NUMBER, 0) as Int
 
-        mainViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(MainViewModel::class.java)
+        viewModelFactory = activity?.let { Inject.provideViewModelFactory(it) }!!
+        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(MainViewModel::class.java)
 
         showLoading(true)
         rvList.layoutManager = LinearLayoutManager(activity)
@@ -66,14 +61,14 @@ class ListFragment : Fragment() {
         when (index) {
             in 0..3 -> {
                 tableDisc.visibility = View.GONE
-                mainViewModel.getMovieList(index).observe(this, Observer {
+                viewModel.getMovieList(index).observe(this, Observer {
                     if (it != null)
                         refreshList(it)
                 })
             }
             in 4..7 -> {
                 tableDisc.visibility = View.GONE
-                mainViewModel.getTVList(index).observe(this, Observer {
+                viewModel.getTVList(index).observe(this, Observer {
                     if (it != null)
                         refreshList(it)
                 })
@@ -88,12 +83,6 @@ class ListFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 //        outState.putParcelableArrayList("extra_state", favAdapter.movieList)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        movieHelper?.close()
-        tvShowHelper?.close()
     }
 
     private fun refreshList(it: ArrayList<*>) {
@@ -117,13 +106,13 @@ class ListFragment : Fragment() {
         tableDisc.visibility = View.VISIBLE
         when(type) {
             MainPagerAdapter.TYPE_MOVIE -> {
-                mainViewModel.getMovieList(index, spinnerYear.selectedItem.toString().toInt(), spinnerSort.selectedItemPosition)
+                viewModel.getMovieList(index, spinnerYear.selectedItem.toString().toInt(), spinnerSort.selectedItemPosition)
                     .observe(this, Observer {
                         if (it != null) { refreshList(it) }
                     })
             }
             MainPagerAdapter.TYPE_TV -> {
-                mainViewModel.getTVList(index, spinnerYear.selectedItem.toString().toInt(), spinnerSort.selectedItemPosition)
+                viewModel.getTVList(index, spinnerYear.selectedItem.toString().toInt(), spinnerSort.selectedItemPosition)
                     .observe(this, Observer {
                         if (it != null) { refreshList(it) }
                     })
@@ -135,22 +124,17 @@ class ListFragment : Fragment() {
         tableDisc.visibility = View.GONE
         when(type){
             MainPagerAdapter.TYPE_MOVIE -> {
-                movieHelper = activity?.applicationContext?.let { MovieHelper.getInstance(it) }
-                movieHelper?.open()
-                val adapter = FavoriteAdapter(type)
+                val adapter = FavoriteAdapter()
+                adapter.notifyDataSetChanged()
                 rvList.adapter = adapter
 
-                GlobalScope.launch(Dispatchers.Main) {
-                    listProg.visibility = View.VISIBLE
-                    val deferredMovies = async(Dispatchers.IO) {
-                        val cursor = movieHelper?.queryAll()
-                        MappingHelper.mapMovieCursorToArrayList(cursor)
+                viewModel.getMovieList()?.observe(this, Observer<List<Movie>>{
+                    if(it != null) {
+                        for(item in it)
+                            Log.d("MovieDB", item.title)
+                        adapter.setData(it)
                     }
-                    listProg.visibility = View.INVISIBLE
-                    val movies = deferredMovies.await()
-                    if (movies.size > 0) adapter.movieList = movies
-                    else adapter.movieList = ArrayList()
-                }
+                })
 
                 adapter.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) {
@@ -160,41 +144,13 @@ class ListFragment : Fragment() {
 
                 adapter.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) {
-                        movieHelper?.deleteById((data as Movie).id)
-                        adapter.removeItem(data, 0)
+                        viewModel.deleteMovie(data as Movie)
                     }
                 })
+                showLoading(false)
             }
             MainPagerAdapter.TYPE_TV -> {
-                tvShowHelper = activity?.applicationContext?.let { TVShowHelper.getInstance(it) }
-                tvShowHelper?.open()
-                val adapter = FavoriteAdapter(type)
-                rvList.adapter = adapter
 
-                GlobalScope.launch(Dispatchers.Main) {
-                    listProg.visibility = View.VISIBLE
-                    val deferredTVShows = async(Dispatchers.IO) {
-                        val cursor = tvShowHelper?.queryAll()
-                        MappingHelper.mapTVShowCursorToArrayList(cursor)
-                    }
-                    listProg.visibility = View.INVISIBLE
-                    val tvShows = deferredTVShows.await()
-                    if (tvShows.size > 0) adapter.tvList = tvShows
-                    else adapter.tvList = ArrayList()
-                }
-
-                adapter.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
-                    override fun onItemClicked(data: Any) {
-                        toDetail(MainPagerAdapter.TYPE_FAVORITE, data)
-                    }
-                })
-
-                adapter.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
-                    override fun onItemClicked(data: Any) {
-                        tvShowHelper?.deleteById((data as TVShow).id)
-                        adapter.removeItem(data, 1)
-                    }
-                })
             }
         }
     }
@@ -252,7 +208,7 @@ class ListFragment : Fragment() {
         }
 
         //Year Spinner
-        val adapterYear = activity?.let { ArrayAdapter<String>(it, android.R.layout.simple_spinner_item, mainViewModel.getYearList()) }
+        val adapterYear = activity?.let { ArrayAdapter<String>(it, android.R.layout.simple_spinner_item, viewModel.getYearList()) }
         adapterYear?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerYear.adapter = adapterYear
         spinnerYear.onItemSelectedListener = spinnerListener

@@ -1,6 +1,5 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
-import android.app.Activity
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +23,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class FavoriteAdapter(private val type: Int): RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>() {
+class FavoriteAdapter(): RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>() {
 
     companion object {
         const val TYPE_MOVIE = 0
@@ -32,7 +31,14 @@ class FavoriteAdapter(private val type: Int): RecyclerView.Adapter<FavoriteAdapt
     }
 
     private var onItemClickCallback: OnItemClickCallback? = null
-    private var onItemDeleteCallback: OnItemClickCallback? = null
+    private var onItemDeletedCallback: OnItemClickCallback? = null
+
+    private var list = ArrayList<Any>()
+
+    fun setData(list: List<*>) {
+        this.list.addAll(listOf(list))
+        notifyDataSetChanged()
+    }
 
     var movieList = ArrayList<Movie>()
         set(movieList) {
@@ -40,6 +46,7 @@ class FavoriteAdapter(private val type: Int): RecyclerView.Adapter<FavoriteAdapt
                 this.movieList.clear()
             }
             this.movieList.addAll(movieList)
+            notifyDataSetChanged()
         }
 
     var tvList = ArrayList<TVShow>()
@@ -48,31 +55,48 @@ class FavoriteAdapter(private val type: Int): RecyclerView.Adapter<FavoriteAdapt
                 this.movieList.clear()
             }
             this.tvList.addAll(tvList)
+            notifyDataSetChanged()
         }
 
     fun removeItem(data: Any, type: Int) {
         when(type){
             0 -> {
-                val position = movieList.indexOf(data as Movie)
+                var position = 0
+                for(item in movieList){
+                    if((data as Movie).id == item.id){
+                        position = movieList.indexOf(item)
+                        break
+                    }
+                }
                 this.movieList.removeAt(position)
                 notifyItemRemoved(position)
+                notifyItemRangeChanged(position, this.movieList.size)
             }
             1 -> {
-                val position = tvList.indexOf(data as TVShow)
+                var position = 0
+                for(item in tvList){
+                    if((data as TVShow).id == item.id){
+                        position = tvList.indexOf(item)
+                        break
+                    }
+                }
                 this.tvList.removeAt(position)
                 notifyItemRemoved(position)
+                notifyItemRangeChanged(position, this.tvList.size)
             }
         }
     }
 
-    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) { this.onItemClickCallback = onItemClickCallback }
+    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
+        this.onItemClickCallback = onItemClickCallback }
 
-    fun setOnDeleteClickCallback(onItemClickCallback: OnItemClickCallback) { this.onItemClickCallback = onItemClickCallback }
+    fun setOnDeleteClickCallback(onItemClickCallback: OnItemClickCallback) {
+        this.onItemDeletedCallback = onItemClickCallback }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder<*> {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_fav, parent, false)
 
-        return when(type) {
+        return when(viewType) {
             TYPE_MOVIE -> MovieViewHolder(view)
             TYPE_TV -> TVShowViewHolder(view)
             else -> throw IllegalArgumentException("Invalid view type")
@@ -81,18 +105,20 @@ class FavoriteAdapter(private val type: Int): RecyclerView.Adapter<FavoriteAdapt
 
     override fun onBindViewHolder(holder: ItemViewHolder<*>, position: Int) {
         when (holder) {
-            is MovieViewHolder -> holder.bind(movieList[position])
-            is TVShowViewHolder -> holder.bind(tvList[position])
+            is MovieViewHolder -> holder.bind(list[position] as Movie)
+            is TVShowViewHolder -> holder.bind(list[position] as TVShow)
         }
     }
 
-    override fun getItemCount(): Int {
-        return when(type) {
-            TYPE_MOVIE -> movieList.size
-            TYPE_TV -> tvList.size
-            else -> throw IllegalArgumentException("Invalid")
+    override fun getItemViewType(position: Int): Int {
+        return when (list[position]) {
+            is Movie -> TYPE_MOVIE
+            is TVShow -> TYPE_TV
+            else -> throw IllegalArgumentException("Invalid type of data $position")
         }
     }
+
+    override fun getItemCount(): Int = list.size
 
 
     abstract class ItemViewHolder<T>(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -117,7 +143,7 @@ class FavoriteAdapter(private val type: Int): RecyclerView.Adapter<FavoriteAdapt
                 setDonut(item.score)
 
                 itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
-                btn_delete.setOnClickListener { onItemDeleteCallback?.onItemClicked(item) }
+                btn_delete.setOnClickListener { onItemDeletedCallback?.onItemClicked(item) }
             }
         }
 
@@ -168,7 +194,7 @@ class FavoriteAdapter(private val type: Int): RecyclerView.Adapter<FavoriteAdapt
                 setDonut(item.score)
 
                 itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
-                btn_delete.setOnClickListener { onItemDeleteCallback?.onItemClicked(item) }
+                btn_delete.setOnClickListener { onItemDeletedCallback?.onItemClicked(item) }
             }
         }
 
