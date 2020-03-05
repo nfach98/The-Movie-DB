@@ -17,7 +17,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
-import com.nf98.moviecatalogue.app.main.MainViewModelFactory
+import com.nf98.moviecatalogue.app.ViewModelFactory
 import com.nf98.moviecatalogue.helper.Inject
 import kotlinx.android.synthetic.main.activity_detail.*
 import java.text.DateFormat
@@ -28,7 +28,7 @@ class DetailActivity : AppCompatActivity(){
 
     private val arguments: DetailActivityArgs by navArgs()
     lateinit var viewModel: DetailViewModel
-    lateinit var viewModelFactory: MainViewModelFactory
+    lateinit var viewModelFactory: ViewModelFactory
 
     var movie = Movie()
     var tvShow = TVShow()
@@ -46,6 +46,7 @@ class DetailActivity : AppCompatActivity(){
             title = ""
         }
         showLoading(true)
+
         id = arguments.id
         type = arguments.type
 
@@ -203,11 +204,11 @@ class DetailActivity : AppCompatActivity(){
 
         when(type){
             DetailPagerAdapter.TYPE_MOVIE -> {
-                viewModel.getMovieList()?.observe(this, Observer<List<Movie>>{
+                viewModel.getMovieList().observe(this, Observer{
                     if(it != null) {
                         for (item in it) {
-                            Log.d("MovieDB", item.title)
-                            if (item.id == id) {
+                            if (item.id == arguments.id) {
+                                Log.d("MovieDB", "${item.title}")
                                 result = true
                                 break
                             }
@@ -216,16 +217,7 @@ class DetailActivity : AppCompatActivity(){
                 })
             }
             DetailPagerAdapter.TYPE_TV -> {
-                /*val cursor = tvShowHelper.queryAll()
-                val list = MappingHelper.mapTVShowCursorToArrayList(cursor)
-                if (list.size > 0) {
-                    for(item in list){
-                        if(item.id == id){
-                            result = true
-                            break
-                        }
-                    }
-                }*/
+
             }
         }
 

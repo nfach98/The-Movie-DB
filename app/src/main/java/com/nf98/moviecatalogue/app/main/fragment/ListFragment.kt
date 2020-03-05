@@ -18,17 +18,15 @@ import com.nf98.moviecatalogue.api.model.TVShow
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainViewModel
-import com.nf98.moviecatalogue.app.main.MainViewModelFactory
+import com.nf98.moviecatalogue.app.ViewModelFactory
 import com.nf98.moviecatalogue.helper.Inject
 import kotlinx.android.synthetic.main.fragment_list.*
 
 class ListFragment : Fragment() {
 
-    private lateinit var viewModelFactory: MainViewModelFactory
+    private lateinit var viewModelFactory: ViewModelFactory
     private lateinit var viewModel: MainViewModel
     private var index = 0
-
-    private lateinit var favAdapter: FavoriteAdapter
 
     companion object {
         private const val ARG_SECTION_NUMBER = "section_number"
@@ -52,7 +50,7 @@ class ListFragment : Fragment() {
         index = arguments?.getInt(ARG_SECTION_NUMBER, 0) as Int
 
         viewModelFactory = activity?.let { Inject.provideViewModelFactory(it) }!!
-        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
         showLoading(true)
         rvList.layoutManager = LinearLayoutManager(activity)
@@ -78,11 +76,6 @@ class ListFragment : Fragment() {
             10 -> updateFavorite(MainPagerAdapter.TYPE_MOVIE)
             11 -> updateFavorite(MainPagerAdapter.TYPE_TV)
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-//        outState.putParcelableArrayList("extra_state", favAdapter.movieList)
     }
 
     private fun refreshList(it: ArrayList<*>) {
@@ -127,13 +120,10 @@ class ListFragment : Fragment() {
                 val adapter = FavoriteAdapter()
                 adapter.notifyDataSetChanged()
                 rvList.adapter = adapter
-
-                viewModel.getMovieList()?.observe(this, Observer<List<Movie>>{
-                    if(it != null) {
-                        for(item in it)
-                            Log.d("MovieDB", item.title)
-                        adapter.setData(it)
-                    }
+                Log.d("MovieDB", "gak onok")
+                viewModel.getMovieList().observe(this, Observer {
+                    if(it != null)
+                        adapter.setData(ArrayList(it))
                 })
 
                 adapter.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {

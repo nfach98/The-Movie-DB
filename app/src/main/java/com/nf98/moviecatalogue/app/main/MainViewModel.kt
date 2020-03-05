@@ -19,10 +19,11 @@ import retrofit2.Response
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainViewModel(private val movieRepos: MovieRepos? = null) : ViewModel() {
+class MainViewModel(private val movieRepos: MovieRepos) : ViewModel() {
 
     companion object {
-        @SuppressLint("ConstantLocale")        val region: String = Locale.getDefault().country
+        @SuppressLint("ConstantLocale")
+        val region: String = Locale.getDefault().country
 
         const val MOVIE_POPULAR = 0
         const val MOVIE_TOP_RATED = 1
@@ -87,11 +88,11 @@ class MainViewModel(private val movieRepos: MovieRepos? = null) : ViewModel() {
         return listMovie
     }
 
-    fun getMovieList(): LiveData<List<Movie>>? = movieRepos?.getAllMovie()
+    fun getMovieList(): LiveData<List<Movie>> = movieRepos.getAllMovie()
 
     fun deleteMovie(movie: Movie){
         viewModelScope.launch {
-            movieRepos?.delete(movie)
+            movieRepos.delete(movie)
         }
     }
 

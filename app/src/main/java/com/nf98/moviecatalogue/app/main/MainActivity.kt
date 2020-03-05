@@ -28,7 +28,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.menu_setting) startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
+        if(item.itemId == R.id.menu_setting)
+            startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
         return super.onOptionsItemSelected(item)
     }
 }

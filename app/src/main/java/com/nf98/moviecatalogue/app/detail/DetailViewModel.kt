@@ -17,7 +17,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.util.ArrayList
 
-class DetailViewModel(private val movieRepos: MovieRepos? = null) : ViewModel() {
+class DetailViewModel(private val movieRepos: MovieRepos) : ViewModel() {
 
     companion object{
         const val MOVIE = 0
@@ -30,17 +30,17 @@ class DetailViewModel(private val movieRepos: MovieRepos? = null) : ViewModel() 
     val casts = MutableLiveData<ArrayList<Credit>>()
     val crews = MutableLiveData<ArrayList<Credit>>()
 
-    internal fun getMovieList(): LiveData<List<Movie>>? = movieRepos?.getAllMovie()
+    internal fun getMovieList(): LiveData<List<Movie>> = movieRepos.getAllMovie()
 
     fun insertMovie(movie: Movie){
         viewModelScope.launch {
-            movieRepos?.insert(movie)
+            movieRepos.insert(movie)
         }
     }
 
     fun deleteMovie(movie: Movie){
         viewModelScope.launch {
-            movieRepos?.delete(movie)
+            movieRepos.delete(movie)
         }
     }
 
@@ -84,7 +84,7 @@ class DetailViewModel(private val movieRepos: MovieRepos? = null) : ViewModel() 
         result.enqueue(object : Callback<CreditsResponse> {
             override fun onResponse(call: Call<CreditsResponse>, response: Response<CreditsResponse>) {
                 if(response.code() == 200)
-                    response.body()?.cast.let { casts.postValue(it) }
+                    response.body()?.cast.let  { casts.postValue(it) }
             }
             override fun onFailure(call: Call<CreditsResponse>, t: Throwable) {
 

@@ -23,68 +23,21 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class FavoriteAdapter(): RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>() {
+class FavoriteAdapter: RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>() {
 
     companion object {
         const val TYPE_MOVIE = 0
         const val TYPE_TV = 1
     }
 
+    private var list = ArrayList<Any>()
     private var onItemClickCallback: OnItemClickCallback? = null
     private var onItemDeletedCallback: OnItemClickCallback? = null
 
-    private var list = ArrayList<Any>()
-
-    fun setData(list: List<*>) {
-        this.list.addAll(listOf(list))
+    fun setData(items: ArrayList<*>) {
+        list.clear()
+        list.addAll(items)
         notifyDataSetChanged()
-    }
-
-    var movieList = ArrayList<Movie>()
-        set(movieList) {
-            if (movieList.size > 0) {
-                this.movieList.clear()
-            }
-            this.movieList.addAll(movieList)
-            notifyDataSetChanged()
-        }
-
-    var tvList = ArrayList<TVShow>()
-        set(tvList) {
-            if (tvList.size > 0) {
-                this.movieList.clear()
-            }
-            this.tvList.addAll(tvList)
-            notifyDataSetChanged()
-        }
-
-    fun removeItem(data: Any, type: Int) {
-        when(type){
-            0 -> {
-                var position = 0
-                for(item in movieList){
-                    if((data as Movie).id == item.id){
-                        position = movieList.indexOf(item)
-                        break
-                    }
-                }
-                this.movieList.removeAt(position)
-                notifyItemRemoved(position)
-                notifyItemRangeChanged(position, this.movieList.size)
-            }
-            1 -> {
-                var position = 0
-                for(item in tvList){
-                    if((data as TVShow).id == item.id){
-                        position = tvList.indexOf(item)
-                        break
-                    }
-                }
-                this.tvList.removeAt(position)
-                notifyItemRemoved(position)
-                notifyItemRangeChanged(position, this.tvList.size)
-            }
-        }
     }
 
     fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
@@ -114,7 +67,7 @@ class FavoriteAdapter(): RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>
         return when (list[position]) {
             is Movie -> TYPE_MOVIE
             is TVShow -> TYPE_TV
-            else -> throw IllegalArgumentException("Invalid type of data $position")
+            else -> throw IllegalArgumentException("Invalid type of data ${list[position].javaClass.name}")
         }
     }
 

@@ -99,7 +99,7 @@
             app:layout_constraintStart_toEndOf="@id/score"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/poster"
-            app:layout_constraintBottom_toTopOf="@id/btnFav"/>
+            app:layout_constraintBottom_toBottomOf="@id/backColor"/>
 
         <com.github.lzyzsd.circleprogress.DonutProgress
             android:id="@+id/score"
@@ -116,17 +116,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tvScore"
             app:layout_constraintTop_toBottomOf="@id/poster"
-            app:layout_constraintBottom_toTopOf="@id/btnFav" />
-
-        <Button
-            android:id="@+id/btnFav"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/fav"
-            android:layout_margin="6dp"
-            app:layout_constraintBottom_toBottomOf="@id/backColor"
-            app:layout_constraintStart_toStartOf="@id/backColor"
-            app:layout_constraintEnd_toEndOf="@id/backColor" />
+            app:layout_constraintBottom_toBottomOf="@id/backColor" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabDetail"
