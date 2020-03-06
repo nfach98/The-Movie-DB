@@ -237,18 +237,21 @@ class ListFragment : Fragment() {
                 val direction = MovieFragmentDirections.actionNavMovieToDetailActivity(null, null)
                 direction.id = (data as Movie).id
                 direction.type = DetailPagerAdapter.TYPE_MOVIE
+                direction.favorite = favorite
                 view?.findNavController()?.navigate(direction)
             }
             MainPagerAdapter.TYPE_TV -> {
                 val direction = TVShowFragmentDirections.actionNavTvShowToDetailActivity(null, null)
                 direction.id = (data as TVShow).id
                 direction.type = DetailPagerAdapter.TYPE_TV
+                direction.favorite = favorite
                 view?.findNavController()?.navigate(direction)
             }
             MainPagerAdapter.TYPE_DISCOVER -> {
                 val direction = DiscoverFragmentDirections.actionNavDiscoverToDetailActivity(null, null)
                 direction.id = if(index == 8) (data as Movie).id else (data as TVShow).id
                 direction.type = if(index == 8) DetailPagerAdapter.TYPE_MOVIE else DetailPagerAdapter.TYPE_TV
+                direction.favorite = favorite
                 view?.findNavController()?.navigate(direction)
             }
             MainPagerAdapter.TYPE_FAVORITE -> {
