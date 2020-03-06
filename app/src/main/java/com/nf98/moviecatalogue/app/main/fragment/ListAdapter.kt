@@ -10,8 +10,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
-import kotlinx.android.synthetic.main.item_fav.view.*
-import kotlinx.android.synthetic.main.item_list.view.*
 import kotlinx.android.synthetic.main.item_list.view.donut_score
 import kotlinx.android.synthetic.main.item_list.view.iv_poster
 import kotlinx.android.synthetic.main.item_list.view.tv_date

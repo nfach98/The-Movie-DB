@@ -131,6 +131,14 @@ class MainViewModel(private val movieRepos: MovieRepos) : ViewModel() {
         return listTVShow
     }
 
+    fun getTVList(): LiveData<List<TVShow>> = movieRepos.getAllTVShow()
+
+    fun deleteTV(tvShow: TVShow){
+        viewModelScope.launch {
+            movieRepos.delete(tvShow)
+        }
+    }
+
     internal fun getYearList(): ArrayList<String> {
         val yearNow = Calendar.getInstance().get(Calendar.YEAR)
         val list = arrayListOf<String>()

@@ -5,30 +5,20 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
-    android:paddingTop="12dp"
-    android:paddingStart="12dp"
-    android:paddingEnd="12dp">
+    android:padding="12dp">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_season"
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/iv_season"
         android:layout_width="90dp"
         android:layout_height="135dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="0dp">
-
-        <ImageView
-            android:id="@+id/iv_season"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            tools:src="@color/colorPrimary" />
-
-    </androidx.cardview.widget.CardView>
+        app:riv_corner_radius="8dp"
+        android:scaleType="fitXY"
+        tools:src="@color/colorPrimary" />
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
-        android:layout_toEndOf="@id/card_season"
+        android:layout_toEndOf="@id/iv_season"
         android:layout_marginStart="16dp"
         android:layout_marginTop="0dp"
         android:textSize="18sp"
@@ -39,7 +29,7 @@
     <TextView
         android:id="@+id/tv_sub"
         android:layout_width="wrap_content"
-        android:layout_toEndOf="@id/card_season"
+        android:layout_toEndOf="@id/iv_season"
         android:layout_below="@id/tv_title"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="0dp"
@@ -50,7 +40,7 @@
     <TextView
         android:id="@+id/tv_seasonDesc"
         android:layout_width="wrap_content"
-        android:layout_toEndOf="@id/card_season"
+        android:layout_toEndOf="@id/iv_season"
         android:layout_below="@id/tv_sub"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="0dp"
@@ -59,13 +49,5 @@
         android:maxLines="4"
         android:ellipsize="end"
         tools:text="Lorem ipsum dolor sit amet"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/card_season"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="0dp"
-        android:background="@android:color/darker_gray" />
 
 </RelativeLayout>

@@ -9,7 +9,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Credit
 import com.nf98.moviecatalogue.api.model.Season
-import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import kotlinx.android.synthetic.main.item_detail_credit.view.*
 import kotlinx.android.synthetic.main.item_detail_season.view.*
 

@@ -1,7 +1,6 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,10 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
+import com.nf98.moviecatalogue.app.ViewModelFactory
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainViewModel
-import com.nf98.moviecatalogue.app.ViewModelFactory
 import com.nf98.moviecatalogue.helper.Inject
 import kotlinx.android.synthetic.main.fragment_list.*
 
@@ -27,6 +26,8 @@ class ListFragment : Fragment() {
     private lateinit var viewModelFactory: ViewModelFactory
     private lateinit var viewModel: MainViewModel
     private var index = 0
+
+    private var dbList = ArrayList<Any>()
 
     companion object {
         private const val ARG_SECTION_NUMBER = "section_number"
@@ -55,30 +56,98 @@ class ListFragment : Fragment() {
         showLoading(true)
         rvList.layoutManager = LinearLayoutManager(activity)
         setSpinner()
+    }
 
+
+    override fun onStart() {
+        super.onStart()
         when (index) {
             in 0..3 -> {
-                tableDisc.visibility = View.GONE
-                viewModel.getMovieList(index).observe(this, Observer {
-                    if (it != null)
-                        refreshList(it)
-                })
+                updateMovie(index)
+                getDb(MainPagerAdapter.TYPE_MOVIE)
             }
             in 4..7 -> {
-                tableDisc.visibility = View.GONE
-                viewModel.getTVList(index).observe(this, Observer {
-                    if (it != null)
-                        refreshList(it)
-                })
+                updateTV(index)
+                getDb(MainPagerAdapter.TYPE_TV)
             }
-            8 -> updateDiscover(MainPagerAdapter.TYPE_MOVIE)
-            9 -> updateDiscover(MainPagerAdapter.TYPE_TV)
-            10 -> updateFavorite(MainPagerAdapter.TYPE_MOVIE)
-            11 -> updateFavorite(MainPagerAdapter.TYPE_TV)
+            8 -> {
+                updateDiscover(MainPagerAdapter.TYPE_MOVIE)
+                getDb(MainPagerAdapter.TYPE_MOVIE)
+            }
+            9 -> {
+                updateDiscover(MainPagerAdapter.TYPE_TV)
+                getDb(MainPagerAdapter.TYPE_TV)
+            }
+            10 -> {
+                updateFavorite(MainPagerAdapter.TYPE_MOVIE)
+                getDb(MainPagerAdapter.TYPE_MOVIE)
+            }
+            11 -> {
+                updateFavorite(MainPagerAdapter.TYPE_TV)
+                getDb(MainPagerAdapter.TYPE_TV)
+            }
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        Inject.closeDatabase()
+    }
+
+    private fun getDb(type: Int){
+        when(type){
+            MainPagerAdapter.TYPE_MOVIE -> {
+                viewModel.getMovieList().observe(this, Observer {
+                    if(it != null) { dbList.addAll(it) }
+                })
+            }
+            MainPagerAdapter.TYPE_TV -> {
+                viewModel.getTVList().observe(this, Observer {
+                    if(it != null) { dbList.addAll(it) }
+                })
+            }
+        }
+    }
+
+    private fun isFavorite(type: Int, data: Any): Boolean{
+        var fav = false
+
+        loop@ for(item in dbList){
+            when(type){
+                MainPagerAdapter.TYPE_MOVIE -> {
+                    if((item as Movie).id == (data as Movie).id) {
+                        fav = true
+                        break@loop
+                    }
+                }
+                MainPagerAdapter.TYPE_TV -> {
+                    if((item as TVShow).id == (data as TVShow).id) {
+                        fav = true
+                        break@loop
+                    }
+                }
+            }
+        }
+
+        return fav
+    }
+
+    private fun updateMovie(index: Int){
+        tableDisc.visibility = View.GONE
+        viewModel.getMovieList(index).observe(this, Observer {
+            if (it != null) refreshList(it)
+        })
+    }
+
+    private fun updateTV(index: Int){
+        tableDisc.visibility = View.GONE
+        viewModel.getTVList(index).observe(this, Observer {
+            if (it != null) refreshList(it)
+        })
+    }
+
     private fun refreshList(it: ArrayList<*>) {
+        showLoading(true)
         val adapter = ListAdapter()
         adapter.notifyDataSetChanged()
         rvList.adapter = adapter
@@ -86,9 +155,10 @@ class ListFragment : Fragment() {
         adapter.setOnItemClickCallback(object : ListAdapter.OnItemClickCallback{
             override fun onItemClicked(data: Any) {
                 when(index) {
-                    in 0..3 -> toDetail(MainPagerAdapter.TYPE_MOVIE, data)
-                    in 4..7 -> toDetail(MainPagerAdapter.TYPE_TV, data)
-                    in 8..9 -> toDetail(MainPagerAdapter.TYPE_DISCOVER, data)
+                    in 0..3 -> toDetail(MainPagerAdapter.TYPE_MOVIE, data, isFavorite(MainPagerAdapter.TYPE_MOVIE, data))
+                    in 4..7 -> toDetail(MainPagerAdapter.TYPE_TV, data, isFavorite(MainPagerAdapter.TYPE_TV, data))
+                    8 -> toDetail(MainPagerAdapter.TYPE_DISCOVER, data, isFavorite(MainPagerAdapter.TYPE_MOVIE, data))
+                    9 -> toDetail(MainPagerAdapter.TYPE_DISCOVER, data, isFavorite(MainPagerAdapter.TYPE_TV, data))
                 }
             }
         })
@@ -121,13 +191,12 @@ class ListFragment : Fragment() {
                 adapter.notifyDataSetChanged()
                 rvList.adapter = adapter
                 viewModel.getMovieList().observe(this, Observer {
-                    if(it != null)
-                        adapter.setData(ArrayList(it))
+                    if(it != null) { adapter.setData(ArrayList(it)) }
                 })
 
                 adapter.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) {
-                        toDetail(MainPagerAdapter.TYPE_FAVORITE, data)
+                        toDetail(MainPagerAdapter.TYPE_FAVORITE, data, isFavorite(MainPagerAdapter.TYPE_MOVIE, data))
                     }
                 })
 
@@ -139,12 +208,30 @@ class ListFragment : Fragment() {
                 showLoading(false)
             }
             MainPagerAdapter.TYPE_TV -> {
+                val adapter = FavoriteAdapter()
+                adapter.notifyDataSetChanged()
+                rvList.adapter = adapter
+                viewModel.getTVList().observe(this, Observer {
+                    if(it != null) adapter.setData(ArrayList(it))
+                })
 
+                adapter.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                    override fun onItemClicked(data: Any) {
+                        toDetail(MainPagerAdapter.TYPE_FAVORITE, data, isFavorite(MainPagerAdapter.TYPE_TV, data))
+                    }
+                })
+
+                adapter.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                    override fun onItemClicked(data: Any) {
+                        viewModel.deleteTV(data as TVShow)
+                    }
+                })
+                showLoading(false)
             }
         }
     }
 
-    private fun toDetail(type: Int, data: Any) {
+    private fun toDetail(type: Int, data: Any, favorite: Boolean = false) {
         when(type) {
             MainPagerAdapter.TYPE_MOVIE -> {
                 val direction = MovieFragmentDirections.actionNavMovieToDetailActivity(null, null)
@@ -171,11 +258,13 @@ class ListFragment : Fragment() {
                         direction = FavoriteFragmentDirections.actionNavFavoriteToDetailActivity(data as Movie, null)
                         direction.id = data.id
                         direction.type = DetailPagerAdapter.TYPE_MOVIE
+                        direction.favorite = favorite
                     }
                     11 -> {
                         direction = FavoriteFragmentDirections.actionNavFavoriteToDetailActivity(null, data as TVShow)
                         direction.id = data.id
                         direction.type = DetailPagerAdapter.TYPE_TV
+                        direction.favorite = favorite
                     }
                 }
                 direction?.let { view?.findNavController()?.navigate(it) }

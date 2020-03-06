@@ -6,9 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
-    android:paddingTop="12dp"
-    android:paddingStart="12dp"
-    android:paddingEnd="12dp">
+    android:padding="12dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_poster"
@@ -80,13 +78,5 @@
         android:textColor="@android:color/black"
         android:textSize="12sp"
         tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eu molestie enim. Duis congue metus eget nunc sagittis, ut congue leo consectetur. Proin maximus lacus ac convallis vestibulum. Aenean hendrerit neque non neque dapibus vulputate. Sed eu ullamcorper ipsum. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam erat volutpat. Phasellus et consequat turpis. Fusce eu tellus convallis, rhoncus augue quis, viverra nulla. Vestibulum suscipit sapien eget turpis hendrerit varius. " />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/card_poster"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="0dp"
-        android:background="@android:color/darker_gray"/>
 
 </RelativeLayout>

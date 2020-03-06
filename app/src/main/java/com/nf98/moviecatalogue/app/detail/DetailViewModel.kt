@@ -59,6 +59,20 @@ class DetailViewModel(private val movieRepos: MovieRepos) : ViewModel() {
         return movie
     }
 
+    internal fun getTVList(): LiveData<List<TVShow>> = movieRepos.getAllTVShow()
+
+    internal fun insertTV(tvShow: TVShow){
+        viewModelScope.launch {
+            movieRepos.insert(tvShow)
+        }
+    }
+
+    internal fun deleteTV(tvShow: TVShow){
+        viewModelScope.launch {
+            movieRepos.delete(tvShow)
+        }
+    }
+
     internal fun getTVShow(id: Int): LiveData<TVShow> {
         val result = ApiMain().services.getTVShow(id)
 

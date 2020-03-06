@@ -33,9 +33,4 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Settings.ACTION_LOCALE_SETTINGS))
         return super.onOptionsItemSelected(item)
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Inject.closeDatabase()
-    }
 }

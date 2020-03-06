@@ -18,12 +18,12 @@ import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 import com.nf98.moviecatalogue.app.ViewModelFactory
+import com.nf98.moviecatalogue.helper.ImageDownloader
 import com.nf98.moviecatalogue.helper.Inject
 import kotlinx.android.synthetic.main.activity_detail.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class DetailActivity : AppCompatActivity(){
 
@@ -34,8 +34,7 @@ class DetailActivity : AppCompatActivity(){
     var movie = Movie()
     var tvShow = TVShow()
 
-    private var isFavorite = false
-
+    var isFavorite = false
     var id = 0
     var type = 0
 
@@ -52,12 +51,12 @@ class DetailActivity : AppCompatActivity(){
 
         id = arguments.id
         type = arguments.type
+        isFavorite = arguments.favorite
 
         viewModelFactory = Inject.provideViewModelFactory(this)
         viewModel = ViewModelProvider(this, viewModelFactory).get(DetailViewModel::class.java)
 
-        getDatabase()
-        Log.d("MovieDB", "$isFavorite")
+        Log.d("MovieDB", "${arguments.id}")
 
         when(type){
             DetailPagerAdapter.TYPE_MOVIE -> {
@@ -98,7 +97,7 @@ class DetailActivity : AppCompatActivity(){
                         Toast.makeText(this@DetailActivity, resources.getString(R.string.del_from_fav), Toast.LENGTH_SHORT).show()
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_false_black_24dp)
                     }
-                    !isFavorite -> {
+                    else -> {
                         addToFavorite()
                         Toast.makeText(this@DetailActivity, resources.getString(R.string.added_to_fav), Toast.LENGTH_SHORT).show()
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_true_black_24dp)
@@ -120,35 +119,37 @@ class DetailActivity : AppCompatActivity(){
             .placeholder(R.drawable.img_poster_na)
             .error(R.drawable.img_poster_na)
 
-        if(type == DetailPagerAdapter.TYPE_MOVIE){
-            setTitle(movie.originalLanguage, movie.originalTitle, movie.title)
-            setDate(movie.releaseDate)
-            setScore(movie.score)
+        when (type) {
+            DetailPagerAdapter.TYPE_MOVIE -> {
+                setTitle(movie.originalLanguage, movie.originalTitle, movie.title)
+                setDate(movie.releaseDate)
+                setScore(movie.score)
 
-            Glide.with(this)
-                .load("https://image.tmdb.org/t/p/w185${movie.posterPath}")
-                .apply(options)
-                .into(poster)
+                Glide.with(this)
+                    .load("https://image.tmdb.org/t/p/w185${movie.posterPath}")
+                    .apply(options)
+                    .into(poster)
 
-            Glide.with(this)
-                .load("https://image.tmdb.org/t/p/original${movie.backdropPath}")
-                .apply(options)
-                .into(backPoster)
-        }
-        if(type == DetailPagerAdapter.TYPE_TV){
-            setTitle(tvShow.originalLanguage, tvShow.originalName, tvShow.name)
-            setDate(tvShow.firstAirDate)
-            setScore(tvShow.score)
+                Glide.with(this)
+                    .load("https://image.tmdb.org/t/p/original${movie.backdropPath}")
+                    .apply(options)
+                    .into(backPoster)
+            }
+            DetailPagerAdapter.TYPE_TV -> {
+                setTitle(tvShow.originalLanguage, tvShow.originalName, tvShow.name)
+                setDate(tvShow.firstAirDate)
+                setScore(tvShow.score)
 
-            Glide.with(this)
-                .load("https://image.tmdb.org/t/p/w185${tvShow.posterPath}")
-                .apply(options)
-                .into(poster)
+                Glide.with(this)
+                    .load("https://image.tmdb.org/t/p/w185${tvShow.posterPath}")
+                    .apply(options)
+                    .into(poster)
 
-            Glide.with(this)
-                .load("https://image.tmdb.org/t/p/original${tvShow.backdropPath}")
-                .apply(options)
-                .into(backPoster)
+                Glide.with(this)
+                    .load("https://image.tmdb.org/t/p/original${tvShow.backdropPath}")
+                    .apply(options)
+                    .into(backPoster)
+            }
         }
         showLoading(false)
     }
@@ -180,6 +181,7 @@ class DetailActivity : AppCompatActivity(){
         }
     }
 
+    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     private fun setDate(input: String?) {
         val parser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val format = DateFormat.getDateInstance(DateFormat.LONG, Locale.getDefault())
@@ -190,62 +192,45 @@ class DetailActivity : AppCompatActivity(){
 
     private fun addToFavorite() {
         when(type){
-            DetailPagerAdapter.TYPE_MOVIE -> viewModel.insertMovie(movie)
-            /*DetailPagerAdapter.TYPE_TV -> {
-                val poster = ImageDownloader(applicationContext, "tv", "${tvShow.id}_poster")
-                tvShow.posterPath?.let { poster.execute("https://image.tmdb.org/t/p/w185${tvShow.posterPath}") }
+            DetailPagerAdapter.TYPE_MOVIE -> {
+                viewModel.insertMovie(movie)
+                isFavorite = true
 
-                val backdrop = ImageDownloader(applicationContext, "tv", "${tvShow.id}_backdrop")
-                tvShow.backdropPath?.let { backdrop.execute("https://image.tmdb.org/t/p/original${tvShow.backdropPath}") }
-            }*/
+                val poster = ImageDownloader(applicationContext, "movie", "poster_${movie.id}")
+                poster.downloadImage("https://image.tmdb.org/t/p/w185${movie.posterPath}")
+
+                val backdrop = ImageDownloader(applicationContext, "movie", "back_${movie.id}")
+                backdrop.downloadImage("https://image.tmdb.org/t/p/original${movie.backdropPath}")
+
+                Log.d("MovieDB", "$isFavorite")
+            }
+            DetailPagerAdapter.TYPE_TV -> {
+                viewModel.insertTV(tvShow)
+                isFavorite = true
+
+                val poster = ImageDownloader(applicationContext, "tv_show", "poster_${tvShow.id}")
+                poster.downloadImage("https://image.tmdb.org/t/p/w185${tvShow.posterPath}")
+
+                val backdrop = ImageDownloader(applicationContext, "tv_show", "back_${tvShow.id}")
+                backdrop.downloadImage("https://image.tmdb.org/t/p/original${tvShow.backdropPath}")
+
+                Log.d("MovieDB", "$isFavorite")
+            }
         }
     }
 
     private fun deleteFromFavorite() {
         when(type){
-            DetailPagerAdapter.TYPE_MOVIE -> viewModel.deleteMovie(movie)
-//            DetailPagerAdapter.TYPE_TV ->
-        }
-    }
-
-    private fun getDatabase() {
-        when(type){
             DetailPagerAdapter.TYPE_MOVIE -> {
-                viewModel.getMovieList().observe(this, Observer{
-                    if(it != null)
-                        setFavorite(ArrayList(it))
-                })
+                viewModel.deleteMovie(movie)
+                isFavorite = false
+                Log.d("MovieDB", "$isFavorite")
             }
-            /*DetailPagerAdapter.TYPE_MOVIE -> {
-
-            }*/
-        }
-    }
-
-    private fun setFavorite(it: ArrayList<*>){
-        val list = ArrayList<Any>()
-        list.clear()
-        list.addAll(it)
-
-        iter@ for (item in it) {
-            when(type){
-                DetailPagerAdapter.TYPE_MOVIE ->{
-                    if ((item as Movie).id == arguments.id) {
-                        isFavorite = true
-                        Log.d("MovieDB", "${item.id}, ${arguments.id}")
-                        break@iter
-                    }
-                }
-                DetailPagerAdapter.TYPE_TV ->{
-                    if ((item as TVShow).id == arguments.id) {
-                        isFavorite = true
-                        Log.d("MovieDB", "${item.name}")
-                        break@iter
-                    }
-                }
+            DetailPagerAdapter.TYPE_TV -> {
+                viewModel.deleteTV(tvShow)
+                isFavorite = false
+                Log.d("MovieDB", "$isFavorite")
             }
         }
     }
-
-
 }

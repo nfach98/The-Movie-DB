@@ -1,5 +1,6 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +31,7 @@ class FavoriteAdapter: RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>()
         const val TYPE_TV = 1
     }
 
-    private var list = ArrayList<Any>()
+    var list = ArrayList<Any>()
     private var onItemClickCallback: OnItemClickCallback? = null
     private var onItemDeletedCallback: OnItemClickCallback? = null
 
@@ -79,6 +80,7 @@ class FavoriteAdapter: RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>()
     }
 
     inner class MovieViewHolder(itemView: View): ItemViewHolder<Movie>(itemView) {
+        @SuppressLint("SdCardPath")
         override fun bind(item: Movie) {
             with(itemView) {
                 val options = RequestOptions()
@@ -86,7 +88,7 @@ class FavoriteAdapter: RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>()
                     .error(R.drawable.img_poster_na)
 
                 Glide.with(this)
-                    .load(Uri.fromFile(File(item.posterPath)))
+                    .load(Uri.fromFile(File("/data/data/com.nf98.moviecatalogue/app_movie/poster_${item.id}.jpg")))
                     .apply(options)
                     .into(iv_poster)
 

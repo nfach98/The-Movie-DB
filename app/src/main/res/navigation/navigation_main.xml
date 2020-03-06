@@ -65,5 +65,9 @@
             android:name="tvShow"
             app:argType="com.nf98.moviecatalogue.api.model.TVShow"
             app:nullable="true" />
+        <argument
+            android:name="favorite"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </activity>
 </navigation>
