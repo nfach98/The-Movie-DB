@@ -23,15 +23,18 @@ import kotlinx.android.synthetic.main.activity_detail.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class DetailActivity : AppCompatActivity(){
 
     private val arguments: DetailActivityArgs by navArgs()
     lateinit var viewModel: DetailViewModel
-    lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var viewModelFactory: ViewModelFactory
 
     var movie = Movie()
     var tvShow = TVShow()
+
+    private var isFavorite = false
 
     var id = 0
     var type = 0
@@ -52,6 +55,9 @@ class DetailActivity : AppCompatActivity(){
 
         viewModelFactory = Inject.provideViewModelFactory(this)
         viewModel = ViewModelProvider(this, viewModelFactory).get(DetailViewModel::class.java)
+
+        getDatabase()
+        Log.d("MovieDB", "$isFavorite")
 
         when(type){
             DetailPagerAdapter.TYPE_MOVIE -> {
@@ -77,11 +83,9 @@ class DetailActivity : AppCompatActivity(){
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_detail, menu)
-        when {
-            isFavorite() -> menu[0].icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_true_black_24dp)
-            else -> menu[0].icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_false_black_24dp)
-        }
-        return true
+        menu[0].icon =  if(isFavorite) ContextCompat.getDrawable(this, R.drawable.ic_favorite_true_black_24dp)
+                        else ContextCompat.getDrawable(this, R.drawable.ic_favorite_false_black_24dp)
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -89,12 +93,12 @@ class DetailActivity : AppCompatActivity(){
             android.R.id.home -> finish()
             R.id.menu_fav -> {
                 when {
-                    isFavorite() -> {
+                    isFavorite -> {
                         deleteFromFavorite()
                         Toast.makeText(this@DetailActivity, resources.getString(R.string.del_from_fav), Toast.LENGTH_SHORT).show()
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_false_black_24dp)
                     }
-                    else -> {
+                    !isFavorite -> {
                         addToFavorite()
                         Toast.makeText(this@DetailActivity, resources.getString(R.string.added_to_fav), Toast.LENGTH_SHORT).show()
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_true_black_24dp)
@@ -104,6 +108,11 @@ class DetailActivity : AppCompatActivity(){
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Inject.closeDatabase()
     }
 
     private fun bind(){
@@ -199,28 +208,44 @@ class DetailActivity : AppCompatActivity(){
         }
     }
 
-    private fun isFavorite() : Boolean {
-        var result = false
-
+    private fun getDatabase() {
         when(type){
             DetailPagerAdapter.TYPE_MOVIE -> {
                 viewModel.getMovieList().observe(this, Observer{
-                    if(it != null) {
-                        for (item in it) {
-                            if (item.id == arguments.id) {
-                                Log.d("MovieDB", "${item.title}")
-                                result = true
-                                break
-                            }
-                        }
-                    }
+                    if(it != null)
+                        setFavorite(ArrayList(it))
                 })
             }
-            DetailPagerAdapter.TYPE_TV -> {
+            /*DetailPagerAdapter.TYPE_MOVIE -> {
 
+            }*/
+        }
+    }
+
+    private fun setFavorite(it: ArrayList<*>){
+        val list = ArrayList<Any>()
+        list.clear()
+        list.addAll(it)
+
+        iter@ for (item in it) {
+            when(type){
+                DetailPagerAdapter.TYPE_MOVIE ->{
+                    if ((item as Movie).id == arguments.id) {
+                        isFavorite = true
+                        Log.d("MovieDB", "${item.id}, ${arguments.id}")
+                        break@iter
+                    }
+                }
+                DetailPagerAdapter.TYPE_TV ->{
+                    if ((item as TVShow).id == arguments.id) {
+                        isFavorite = true
+                        Log.d("MovieDB", "${item.name}")
+                        break@iter
+                    }
+                }
             }
         }
-
-        return result
     }
+
+
 }

@@ -32,13 +32,13 @@ class DetailViewModel(private val movieRepos: MovieRepos) : ViewModel() {
 
     internal fun getMovieList(): LiveData<List<Movie>> = movieRepos.getAllMovie()
 
-    fun insertMovie(movie: Movie){
+    internal fun insertMovie(movie: Movie){
         viewModelScope.launch {
             movieRepos.insert(movie)
         }
     }
 
-    fun deleteMovie(movie: Movie){
+    internal fun deleteMovie(movie: Movie){
         viewModelScope.launch {
             movieRepos.delete(movie)
         }

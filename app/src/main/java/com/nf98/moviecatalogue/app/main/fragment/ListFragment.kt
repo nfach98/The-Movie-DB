@@ -120,7 +120,6 @@ class ListFragment : Fragment() {
                 val adapter = FavoriteAdapter()
                 adapter.notifyDataSetChanged()
                 rvList.adapter = adapter
-                Log.d("MovieDB", "gak onok")
                 viewModel.getMovieList().observe(this, Observer {
                     if(it != null)
                         adapter.setData(ArrayList(it))

@@ -7,9 +7,15 @@ import com.nf98.moviecatalogue.database.MovieRepos
 
 object Inject {
 
+    lateinit var movieDb: MovieDatabase
+
     private fun provideMovieRepos(context: Context): MovieRepos {
-        val movieDb = MovieDatabase.getDatabase(context)
+        movieDb = MovieDatabase.getDatabase(context)
         return MovieRepos(movieDb.movieDao())
+    }
+
+    fun closeDatabase(){
+        movieDb.close()
     }
 
     fun provideViewModelFactory(context: Context): ViewModelFactory {
