@@ -1,6 +1,5 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContextWrapper
 import android.net.Uri
@@ -14,12 +13,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
-import kotlinx.android.synthetic.main.item_fav.view.*
-import kotlinx.android.synthetic.main.item_list.view.donut_score
-import kotlinx.android.synthetic.main.item_list.view.iv_poster
-import kotlinx.android.synthetic.main.item_list.view.tv_date
-import kotlinx.android.synthetic.main.item_list.view.tv_desc
-import kotlinx.android.synthetic.main.item_list.view.tv_name
+import kotlinx.android.synthetic.main.item_list.view.*
 import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -35,7 +29,7 @@ class FavoriteAdapter(val context: Context): RecyclerView.Adapter<FavoriteAdapte
 
     var list = ArrayList<Any>()
     private var onItemClickCallback: OnItemClickCallback? = null
-    private var onItemDeletedCallback: OnItemClickCallback? = null
+    private var showSheetCallback: OnItemClickCallback? = null
 
     fun setData(items: ArrayList<*>) {
         list.clear()
@@ -46,11 +40,11 @@ class FavoriteAdapter(val context: Context): RecyclerView.Adapter<FavoriteAdapte
     fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
         this.onItemClickCallback = onItemClickCallback }
 
-    fun setOnDeleteClickCallback(onItemClickCallback: OnItemClickCallback) {
-        this.onItemDeletedCallback = onItemClickCallback }
+    fun setShowSheetCallback(onItemClickCallback: OnItemClickCallback) {
+        this.showSheetCallback = onItemClickCallback }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder<*> {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_fav, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_list, parent, false)
 
         return when(viewType) {
             TYPE_MOVIE -> MovieViewHolder(view)
@@ -103,7 +97,7 @@ class FavoriteAdapter(val context: Context): RecyclerView.Adapter<FavoriteAdapte
                 setDonut(item.score)
 
                 itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
-                btn_delete.setOnClickListener { onItemDeletedCallback?.onItemClicked(item) }
+                menu_more.setOnClickListener { showSheetCallback?.onItemClicked(item) }
             }
         }
 
@@ -158,7 +152,7 @@ class FavoriteAdapter(val context: Context): RecyclerView.Adapter<FavoriteAdapte
                 setDonut(item.score)
 
                 itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
-                btn_delete.setOnClickListener { onItemDeletedCallback?.onItemClicked(item) }
+                menu_more.setOnClickListener { showSheetCallback?.onItemClicked(item) }
             }
         }
 

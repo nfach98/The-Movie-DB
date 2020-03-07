@@ -10,11 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
-import kotlinx.android.synthetic.main.item_list.view.donut_score
-import kotlinx.android.synthetic.main.item_list.view.iv_poster
-import kotlinx.android.synthetic.main.item_list.view.tv_date
-import kotlinx.android.synthetic.main.item_list.view.tv_desc
-import kotlinx.android.synthetic.main.item_list.view.tv_name
+import kotlinx.android.synthetic.main.item_list.view.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,6 +25,7 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
 
     private val list = ArrayList<Any>()
     private var onItemClickCallback: OnItemClickCallback? = null
+    private var showSheetCallback: OnItemClickCallback? = null
 
     fun setData(items: ArrayList<*>) {
         list.clear()
@@ -39,6 +36,9 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
     fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
         this.onItemClickCallback = onItemClickCallback
     }
+
+    fun setShowSheetCallback(onItemClickCallback: OnItemClickCallback) {
+        this.showSheetCallback = onItemClickCallback }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder<*> {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_list, parent, false)
@@ -90,6 +90,7 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
                 setDonut(item.score)
 
                 itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
+                menu_more.setOnClickListener { showSheetCallback?.onItemClicked(item) }
             }
         }
 
@@ -136,6 +137,7 @@ class ListAdapter: RecyclerView.Adapter<ListAdapter.ItemViewHolder<*>>() {
                 setDonut(item.score)
 
                 itemView.setOnClickListener { onItemClickCallback?.onItemClicked(item) }
+                menu_more.setOnClickListener { showSheetCallback?.onItemClicked(item) }
             }
         }
 

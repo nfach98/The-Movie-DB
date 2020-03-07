@@ -54,6 +54,9 @@
     <string name="title_asc">Judul ↑</string>
 
     <string name="added_to_fav">Ditambahkan ke Favorit</string>
-    <string name="del_from_fav">Dihapus dari Favorit</string>
+    <string name="add_to_fav">Tambah ke Favorit</string>
+    <string name="deleted_from_fav">Dihapus dari Favorit</string>
+    <string name="del_from_fav">Hapus dari Favorit</string>
+    <string name="share">Bagikan</string>
 
 </resources>

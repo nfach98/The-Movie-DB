@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
@@ -18,8 +19,16 @@ import com.nf98.moviecatalogue.app.ViewModelFactory
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainViewModel
+import com.nf98.moviecatalogue.helper.ImageManager
 import com.nf98.moviecatalogue.helper.Inject
 import kotlinx.android.synthetic.main.fragment_list.*
+import kotlinx.android.synthetic.main.layout_main_bottom_sheet.*
+import kotlinx.android.synthetic.main.layout_main_bottom_sheet.btn_fav
+import kotlinx.android.synthetic.main.layout_main_bottom_sheet.sheet_title
+import kotlinx.android.synthetic.main.layout_main_bottom_sheet.sheet_year
+import kotlinx.android.synthetic.main.layout_main_bottom_sheet.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ListFragment : Fragment() {
 
@@ -162,6 +171,15 @@ class ListFragment : Fragment() {
                 }
             }
         })
+
+        adapter.setShowSheetCallback(object : ListAdapter.OnItemClickCallback {
+            override fun onItemClicked(data: Any) {
+                when(index) {
+                    in 0..3, 8 -> showBottomSheet(MainPagerAdapter.TYPE_MOVIE, data)
+                    in 4..7, 9 -> showBottomSheet(MainPagerAdapter.TYPE_TV, data)
+                }
+            }
+        })
         showLoading(false)
     }
 
@@ -200,10 +218,8 @@ class ListFragment : Fragment() {
                     }
                 })
 
-                adapter?.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
-                    override fun onItemClicked(data: Any) {
-                        viewModel.deleteMovie(data as Movie)
-                    }
+                adapter?.setShowSheetCallback(object : FavoriteAdapter.OnItemClickCallback {
+                    override fun onItemClicked(data: Any) { showBottomSheet(MainPagerAdapter.TYPE_MOVIE, data) }
                 })
                 showLoading(false)
             }
@@ -221,10 +237,8 @@ class ListFragment : Fragment() {
                     }
                 })
 
-                adapter?.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
-                    override fun onItemClicked(data: Any) {
-                        viewModel.deleteTV(data as TVShow)
-                    }
+                adapter?.setShowSheetCallback(object : FavoriteAdapter.OnItemClickCallback {
+                    override fun onItemClicked(data: Any) { showBottomSheet(MainPagerAdapter.TYPE_TV, data) }
                 })
                 showLoading(false)
             }
@@ -276,6 +290,77 @@ class ListFragment : Fragment() {
     }
 
     private fun showLoading(state: Boolean) { listProg.visibility = if(state) View.VISIBLE else View.GONE }
+
+    private fun showBottomSheet(type: Int, data: Any){
+        val view = layoutInflater.inflate(R.layout.layout_main_bottom_sheet, null)
+        val dialog = activity?.let { it -> BottomSheetDialog(it) }
+        dialog?.setContentView(view)
+            when (type) {
+                MainPagerAdapter.TYPE_MOVIE -> {
+                    view.sheet_title.text = getTitle(
+                        (data as Movie).originalLanguage,
+                        data.originalTitle,
+                        data.title
+                    )
+                    view.sheet_year.text = data.releaseDate?.subSequence(0..3)
+
+                    if (isFavorite(type, data)) view.btn_fav.text =
+                        resources.getString(R.string.del_from_fav)
+                    else view.btn_fav.text = resources.getString(R.string.add_to_fav)
+
+                    view.btn_fav.setOnClickListener {
+                        if (isFavorite(type, data)) {
+                            viewModel.deleteMovie(data)
+                            activity?.applicationContext?.let { it1 ->
+                                ImageManager(it1, "movie", "poster_${data.id}").deleteImage()
+                                ImageManager(it1, "movie", "back_${data.id}").deleteImage()
+                            }
+                        } else {
+                            viewModel.insertMovie(data)
+                            activity?.applicationContext?.let { it1 ->
+                                ImageManager(it1, "movie", "poster_${data.id}")
+                                    .downloadImage("https://image.tmdb.org/t/p/w185${data.posterPath}")
+
+                                ImageManager(it1, "movie", "back_${data.id}")
+                                    .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
+                            }
+                        }
+                    }
+                }
+                MainPagerAdapter.TYPE_TV -> {
+                    view.sheet_title.text = getTitle((data as TVShow).originalLanguage, data.originalName, data.name)
+                    view.sheet_year.text = data.firstAirDate?.subSequence(0..3)
+                    if (isFavorite(type, data))
+                        view.btn_fav.text = resources.getString(R.string.del_from_fav)
+                    else view.btn_fav.text = resources.getString(R.string.add_to_fav)
+
+                    view.btn_fav.setOnClickListener {
+                        if (isFavorite(type, data)) {
+                            viewModel.deleteTV(data)
+                            activity?.applicationContext?.let { it1 ->
+                                ImageManager(it1, "tv_show", "poster_${data.id}").deleteImage()
+                                ImageManager(it1, "tv_show", "back_${data.id}").deleteImage()
+                            }
+                        } else {
+                            viewModel.insertTV(data)
+                            activity?.applicationContext?.let { it1 ->
+                                ImageManager(it1, "tv_show", "poster_${data.id}")
+                                    .downloadImage("https://image.tmdb.org/t/p/w185${data.posterPath}")
+
+                                ImageManager(it1, "tv_show", "back_${data.id}")
+                                    .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
+                            }
+
+                        }
+                    }
+                }
+            }
+        dialog?.show()
+    }
+
+    private fun getTitle(lang: String?, oriTitle: String?, intTitle: String?): String?{
+        return if(Locale.getDefault().language == lang) oriTitle else intTitle
+    }
 
     private fun setSpinner() {
         val spinnerListener = object : AdapterView.OnItemSelectedListener {

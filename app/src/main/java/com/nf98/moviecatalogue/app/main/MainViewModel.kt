@@ -90,6 +90,12 @@ class MainViewModel(private val movieRepos: MovieRepos) : ViewModel() {
 
     fun getMovieList(): LiveData<List<Movie>> = movieRepos.getAllMovie()
 
+    internal fun insertMovie(movie: Movie){
+        viewModelScope.launch {
+            movieRepos.insert(movie)
+        }
+    }
+
     fun deleteMovie(movie: Movie){
         viewModelScope.launch {
             movieRepos.delete(movie)
@@ -132,6 +138,12 @@ class MainViewModel(private val movieRepos: MovieRepos) : ViewModel() {
     }
 
     fun getTVList(): LiveData<List<TVShow>> = movieRepos.getAllTVShow()
+
+    internal fun insertTV(tvShow: TVShow){
+        viewModelScope.launch {
+            movieRepos.insert(tvShow)
+        }
+    }
 
     fun deleteTV(tvShow: TVShow){
         viewModelScope.launch {

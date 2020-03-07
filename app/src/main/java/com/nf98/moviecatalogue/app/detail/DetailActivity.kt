@@ -91,7 +91,7 @@ class DetailActivity : AppCompatActivity(){
                 when {
                     isFavorite -> {
                         deleteFromFavorite()
-                        Toast.makeText(this@DetailActivity, resources.getString(R.string.del_from_fav), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@DetailActivity, resources.getString(R.string.deleted_from_fav), Toast.LENGTH_SHORT).show()
                         item.icon = ContextCompat.getDrawable(this, R.drawable.ic_favorite_false_black_24dp)
                     }
                     else -> {

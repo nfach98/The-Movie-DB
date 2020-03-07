@@ -79,6 +79,9 @@
     </string-array>
 
     <string name="added_to_fav">Added to Favorite</string>
-    <string name="del_from_fav">Deleted from Favorite</string>
+    <string name="add_to_fav">Add to Favorite</string>
+    <string name="deleted_from_fav">Deleted from Favorite</string>
+    <string name="del_from_fav">Delete from Favorite</string>
+    <string name="share">Share</string>
 
 </resources>
