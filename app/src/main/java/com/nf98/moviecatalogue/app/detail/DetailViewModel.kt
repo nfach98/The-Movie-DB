@@ -30,8 +30,6 @@ class DetailViewModel(private val movieRepos: MovieRepos) : ViewModel() {
     val casts = MutableLiveData<ArrayList<Credit>>()
     val crews = MutableLiveData<ArrayList<Credit>>()
 
-    internal fun getMovieList(): LiveData<List<Movie>> = movieRepos.getAllMovie()
-
     internal fun insertMovie(movie: Movie){
         viewModelScope.launch {
             movieRepos.insert(movie)
@@ -53,13 +51,11 @@ class DetailViewModel(private val movieRepos: MovieRepos) : ViewModel() {
                     response.body().let { movie.postValue(it) }
             }
             override fun onFailure(call: Call<Movie>, t: Throwable) {
-                Log.d("MovieDB: ", t.message)
+                Log.d("MovieDB", t.message)
             }
         })
         return movie
     }
-
-    internal fun getTVList(): LiveData<List<TVShow>> = movieRepos.getAllTVShow()
 
     internal fun insertTV(tvShow: TVShow){
         viewModelScope.launch {
@@ -82,13 +78,13 @@ class DetailViewModel(private val movieRepos: MovieRepos) : ViewModel() {
                     response.body().let { tvShow.postValue(it) }
             }
             override fun onFailure(call: Call<TVShow>, t: Throwable) {
-                Log.d("MovieDB: ", t.message)
+                Log.d("MovieDB", t.message)
             }
         })
         return tvShow
     }
 
-    internal fun getCasts(type: Int, id: Int): LiveData<ArrayList<Credit>> {
+    internal fun getCasts(type: Int, id: Int, onFailure: OnFailure? = null): LiveData<ArrayList<Credit>> {
         val result = when (type) {
             MOVIE -> ApiMain().services.getMovieCredits(id)
             TV -> ApiMain().services.getTVCredits(id)
@@ -101,13 +97,13 @@ class DetailViewModel(private val movieRepos: MovieRepos) : ViewModel() {
                     response.body()?.cast.let  { casts.postValue(it) }
             }
             override fun onFailure(call: Call<CreditsResponse>, t: Throwable) {
-
+                onFailure?.fail()
             }
         })
         return casts
     }
 
-    internal fun getCrews(type: Int, id: Int): LiveData<ArrayList<Credit>> {
+    internal fun getCrews(type: Int, id: Int, onFailure: OnFailure? = null): LiveData<ArrayList<Credit>> {
         val result = when (type) {
             MOVIE -> ApiMain().services.getMovieCredits(id)
             TV -> ApiMain().services.getTVCredits(id)
@@ -120,9 +116,13 @@ class DetailViewModel(private val movieRepos: MovieRepos) : ViewModel() {
                     response.body()?.crew.let { crews.postValue(it) }
             }
             override fun onFailure(call: Call<CreditsResponse>, t: Throwable) {
-
+                onFailure?.fail()
             }
         })
         return crews
+    }
+
+    interface OnFailure {
+        fun fail()
     }
 }

@@ -1,14 +1,10 @@
 package com.nf98.moviecatalogue.api.model
 
 import android.os.Parcelable
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
+import androidx.room.*
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.parcel.RawValue
 
 @Parcelize
 @Entity(tableName = "movie")
@@ -34,7 +30,7 @@ data class Movie(
 
     @SerializedName("poster_path")
     @Expose
-    @ColumnInfo(name = "poster_path")
+    @Ignore
     var posterPath: String? = null,
 
     @SerializedName("id")
@@ -48,7 +44,7 @@ data class Movie(
 
     @SerializedName("backdrop_path")
     @Expose
-    @ColumnInfo(name = "backdrop_path")
+    @Ignore
     var backdropPath: String? = null,
 
     @SerializedName("original_language")
@@ -63,9 +59,8 @@ data class Movie(
 
     @SerializedName("genres")
     @Expose
-    @Ignore
-    /*@ColumnInfo(name = "genres")*/
-    var genres : @RawValue List<Genre>? = null,
+    @ColumnInfo(name = "genres")
+    var genres : List<Genre>? = null,
 
     @SerializedName("title")
     @Expose

@@ -187,20 +187,20 @@ class ListFragment : Fragment() {
         tableDisc.visibility = View.GONE
         when(type){
             MainPagerAdapter.TYPE_MOVIE -> {
-                val adapter = FavoriteAdapter()
-                adapter.notifyDataSetChanged()
+                val adapter = activity?.applicationContext?.let { FavoriteAdapter(it) }
+                adapter?.notifyDataSetChanged()
                 rvList.adapter = adapter
                 viewModel.getMovieList().observe(this, Observer {
-                    if(it != null) { adapter.setData(ArrayList(it)) }
+                    if(it != null) { adapter?.setData(ArrayList(it)) }
                 })
 
-                adapter.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                adapter?.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) {
                         toDetail(MainPagerAdapter.TYPE_FAVORITE, data, isFavorite(MainPagerAdapter.TYPE_MOVIE, data))
                     }
                 })
 
-                adapter.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                adapter?.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) {
                         viewModel.deleteMovie(data as Movie)
                     }
@@ -208,20 +208,20 @@ class ListFragment : Fragment() {
                 showLoading(false)
             }
             MainPagerAdapter.TYPE_TV -> {
-                val adapter = FavoriteAdapter()
-                adapter.notifyDataSetChanged()
+                val adapter = activity?.applicationContext?.let { FavoriteAdapter(it) }
+                adapter?.notifyDataSetChanged()
                 rvList.adapter = adapter
                 viewModel.getTVList().observe(this, Observer {
-                    if(it != null) adapter.setData(ArrayList(it))
+                    if(it != null) adapter?.setData(ArrayList(it))
                 })
 
-                adapter.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                adapter?.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) {
                         toDetail(MainPagerAdapter.TYPE_FAVORITE, data, isFavorite(MainPagerAdapter.TYPE_TV, data))
                     }
                 })
 
-                adapter.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
+                adapter?.setOnDeleteClickCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) {
                         viewModel.deleteTV(data as TVShow)
                     }

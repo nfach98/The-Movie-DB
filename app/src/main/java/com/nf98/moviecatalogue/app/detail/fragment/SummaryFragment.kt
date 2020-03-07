@@ -15,6 +15,7 @@ import com.nf98.moviecatalogue.api.model.*
 import com.nf98.moviecatalogue.app.detail.DetailActivity
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import com.nf98.moviecatalogue.app.detail.DetailViewModel
+import com.nf98.moviecatalogue.app.detail.DetailViewModel.OnFailure
 import kotlinx.android.synthetic.main.fragment_detail_summary.*
 
 class SummaryFragment : Fragment() {
@@ -85,24 +86,27 @@ class SummaryFragment : Fragment() {
                 if(item.season_number == tvShow.number_of_seasons)
                     season = item
             }
+
+            val options = RequestOptions()
+                .placeholder(R.drawable.img_poster_na)
+                .error(R.drawable.img_poster_na)
+
+            Glide.with(this)
+                .load("https://image.tmdb.org/t/p/w154${season.poster_path}")
+                .apply(options)
+                .into(ivCurSeason)
+
+            tvCurSeasonTitle.text = season.name
+            tvCurSeasonSub.text = "${season.air_date?.subSequence(0..3)} | ${season.episode_count} episode"
+            tvCurSeasonDesc.text = season.overview
         }
-
-        val options = RequestOptions()
-            .placeholder(R.drawable.img_poster_na)
-            .error(R.drawable.img_poster_na)
-
-        Glide.with(this)
-            .load("https://image.tmdb.org/t/p/w154${season.poster_path}")
-            .apply(options)
-            .into(ivCurSeason)
-
-        tvCurSeasonTitle.text = season.name
-        tvCurSeasonSub.text = "${season.air_date?.subSequence(0..3)} | ${season.episode_count} episode"
-        tvCurSeasonDesc.text = season.overview
+        else showSeason(false)
     }
 
     private fun getCasts(){
-        viewModel.getCasts(type, (activity as DetailActivity).id).observe(this, Observer {
+        viewModel.getCasts(type, (activity as DetailActivity).id, object : OnFailure{
+                override fun fail() = showCast(false)
+            }).observe(this, Observer {
             if (it != null && it.size != 0) {
                 val list = ArrayList<Credit>()
                 if(it.size >= 5) {
@@ -113,6 +117,7 @@ class SummaryFragment : Fragment() {
                     for (item in it)
                         list.add(item)
                 }
+                showCast(true)
                 refreshList(SummaryAdapter.TYPE_CAST, list)
             }
             else showCast(false)
@@ -120,7 +125,9 @@ class SummaryFragment : Fragment() {
     }
 
     private fun getCrews(){
-        viewModel.getCrews(type, (activity as DetailActivity).id).observe(this, Observer {
+        viewModel.getCrews(type, (activity as DetailActivity).id, object : OnFailure{
+            override fun fail() = showCrew(false)
+            }).observe(this, Observer {
             if (it != null && it.size != 0){
                 val list = ArrayList<Credit>()
                 if(it.size >= 4) {
@@ -131,6 +138,7 @@ class SummaryFragment : Fragment() {
                     for (item in it)
                         list.add(item)
                 }
+                showCrew(true)
                 refreshList(SummaryAdapter.TYPE_CREW, list)
             }
             else showCrew(false)

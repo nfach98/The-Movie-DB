@@ -18,6 +18,7 @@ class DetailPagerAdapter(private val context: Context, fm: FragmentManager, priv
     companion object{
         const val TYPE_MOVIE = 0
         const val TYPE_TV = 1
+        const val TYPE_FAVORITE = 2
     }
 
     @StringRes
@@ -27,6 +28,7 @@ class DetailPagerAdapter(private val context: Context, fm: FragmentManager, priv
         when(type) {
             TYPE_MOVIE -> TITLES = intArrayOf(R.string.summary, R.string.cast, R.string.crew, R.string.fact)
             TYPE_TV -> TITLES = intArrayOf(R.string.summary, R.string.season, R.string.cast, R.string.fact)
+            TYPE_FAVORITE -> TITLES = intArrayOf(R.string.summary, R.string.fact)
         }
     }
 
@@ -42,10 +44,15 @@ class DetailPagerAdapter(private val context: Context, fm: FragmentManager, priv
         }
         if(type == TYPE_TV) {
             when (position) {
-                0 -> fragment =
-                    SummaryFragment()
+                0 -> fragment = SummaryFragment()
                 in 1..2 -> fragment = CreditFragment.newInstance(position - 1)
                 3 -> fragment = FactFragment()
+            }
+        }
+        if(type == TYPE_FAVORITE) {
+            when (position) {
+                0 -> fragment = SummaryFragment()
+                1 -> fragment = FactFragment()
             }
         }
 

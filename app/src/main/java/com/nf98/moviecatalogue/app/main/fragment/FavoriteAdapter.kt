@@ -1,6 +1,8 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.ContextWrapper
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class FavoriteAdapter: RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>() {
+class FavoriteAdapter(val context: Context): RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>() {
 
     companion object {
         const val TYPE_MOVIE = 0
@@ -80,15 +82,18 @@ class FavoriteAdapter: RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>()
     }
 
     inner class MovieViewHolder(itemView: View): ItemViewHolder<Movie>(itemView) {
-        @SuppressLint("SdCardPath")
         override fun bind(item: Movie) {
             with(itemView) {
                 val options = RequestOptions()
                     .placeholder(R.drawable.img_poster_na)
                     .error(R.drawable.img_poster_na)
+                val wrapper = ContextWrapper(context)
+
+                var poster = wrapper.getDir("movie", Context.MODE_PRIVATE)
+                poster = File(poster, "poster_${item.id}.jpg")
 
                 Glide.with(this)
-                    .load(Uri.fromFile(File("/data/data/com.nf98.moviecatalogue/app_movie/poster_${item.id}.jpg")))
+                    .load(Uri.fromFile(poster))
                     .apply(options)
                     .into(iv_poster)
 
@@ -137,9 +142,13 @@ class FavoriteAdapter: RecyclerView.Adapter<FavoriteAdapter.ItemViewHolder<*>>()
                 val options = RequestOptions()
                     .placeholder(R.drawable.img_poster_na)
                     .error(R.drawable.img_poster_na)
+                val wrapper = ContextWrapper(context)
+
+                var poster = wrapper.getDir("tv_show", Context.MODE_PRIVATE)
+                poster = File(poster, "poster_${item.id}.jpg")
 
                 Glide.with(this)
-                    .load(Uri.fromFile(File(item.posterPath)))
+                    .load(Uri.fromFile(poster))
                     .apply(options)
                     .into(iv_poster)
 

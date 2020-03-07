@@ -15,7 +15,7 @@ import kotlinx.android.parcel.RawValue
 data class TVShow (
     @SerializedName("episode_run_time")
     @Expose
-    @Ignore
+    @ColumnInfo(name = "run_times")
     var duration : List<Int>? = null,
 
     @SerializedName("original_name")
@@ -25,8 +25,8 @@ data class TVShow (
 
     @SerializedName("genres")
     @Expose
-    @Ignore
-    var genres : @RawValue List<Genre>? = null,
+    @ColumnInfo(name = "genres")
+    var genres : List<Genre>? = null,
 
     @SerializedName("genre_ids")
     @Expose
@@ -70,7 +70,7 @@ data class TVShow (
 
     @SerializedName("backdrop_path")
     @Expose
-    @ColumnInfo(name = "backdrop_path")
+    @Ignore
     var backdropPath: String? = null,
 
     @SerializedName("original_language")
@@ -95,7 +95,7 @@ data class TVShow (
 
     @SerializedName("poster_path")
     @Expose
-    @ColumnInfo(name = "poster_path")
+    @Ignore
     var posterPath: String? = null,
 
     @SerializedName("status")

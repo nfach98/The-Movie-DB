@@ -12,7 +12,6 @@ class ApiMain : Application() {
 
     companion object {
         private const val BASE_API_URL = "https://api.themoviedb.org/3/"
-        const val API_KEY = "f1fb599be2a8084210ab493502e6c728"
     }
 
     private val client = OkHttpClient().newBuilder()
