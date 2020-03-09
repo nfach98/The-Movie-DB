@@ -1,5 +1,6 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.nf98.moviecatalogue.R
 import com.nf98.moviecatalogue.api.model.Movie
@@ -22,13 +25,10 @@ import com.nf98.moviecatalogue.app.main.MainViewModel
 import com.nf98.moviecatalogue.helper.ImageManager
 import com.nf98.moviecatalogue.helper.Inject
 import kotlinx.android.synthetic.main.fragment_list.*
-import kotlinx.android.synthetic.main.layout_main_bottom_sheet.*
-import kotlinx.android.synthetic.main.layout_main_bottom_sheet.btn_fav
-import kotlinx.android.synthetic.main.layout_main_bottom_sheet.sheet_title
-import kotlinx.android.synthetic.main.layout_main_bottom_sheet.sheet_year
 import kotlinx.android.synthetic.main.layout_main_bottom_sheet.view.*
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class ListFragment : Fragment() {
 
@@ -294,67 +294,91 @@ class ListFragment : Fragment() {
     private fun showBottomSheet(type: Int, data: Any){
         val view = layoutInflater.inflate(R.layout.layout_main_bottom_sheet, null)
         val dialog = activity?.let { it -> BottomSheetDialog(it) }
+        val options = RequestOptions()
+            .placeholder(R.drawable.img_poster_na)
+            .error(R.drawable.img_poster_na)
+
         dialog?.setContentView(view)
-            when (type) {
-                MainPagerAdapter.TYPE_MOVIE -> {
-                    view.sheet_title.text = getTitle(
-                        (data as Movie).originalLanguage,
-                        data.originalTitle,
-                        data.title
-                    )
-                    view.sheet_year.text = data.releaseDate?.subSequence(0..3)
+        dialog?.window?.decorView?.findViewById<View>(R.id.design_bottom_sheet)?.setBackgroundResource(android.R.color.transparent)
+        when (type) {
+            MainPagerAdapter.TYPE_MOVIE -> {
+                Glide.with(this)
+                    .load("https://image.tmdb.org/t/p/w154${(data as Movie).posterPath}")
+                    .apply(options)
+                    .into(view.sheet_poster)
 
-                    if (isFavorite(type, data)) view.btn_fav.text =
-                        resources.getString(R.string.del_from_fav)
-                    else view.btn_fav.text = resources.getString(R.string.add_to_fav)
+                view.sheet_title.text = getTitle(data.originalLanguage, data.originalTitle, data.title)
+                view.sheet_year.text = data.releaseDate?.subSequence(0..3)
 
-                    view.btn_fav.setOnClickListener {
-                        if (isFavorite(type, data)) {
-                            viewModel.deleteMovie(data)
-                            activity?.applicationContext?.let { it1 ->
-                                ImageManager(it1, "movie", "poster_${data.id}").deleteImage()
-                                ImageManager(it1, "movie", "back_${data.id}").deleteImage()
-                            }
-                        } else {
-                            viewModel.insertMovie(data)
-                            activity?.applicationContext?.let { it1 ->
-                                ImageManager(it1, "movie", "poster_${data.id}")
-                                    .downloadImage("https://image.tmdb.org/t/p/w185${data.posterPath}")
+                if (isFavorite(type, data)) view.btn_fav.text = resources.getString(R.string.del_from_fav)
+                else view.btn_fav.text = resources.getString(R.string.add_to_fav)
 
-                                ImageManager(it1, "movie", "back_${data.id}")
-                                    .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
-                            }
+                view.btn_fav.setOnClickListener {
+                    if (isFavorite(type, data)) {
+                        viewModel.deleteMovie(data)
+                        activity?.applicationContext?.let { it1 ->
+                            ImageManager(it1, "movie", "poster_${data.id}").deleteImage()
+                            ImageManager(it1, "movie", "back_${data.id}").deleteImage()
+                        }
+                    } else {
+                        viewModel.insertMovie(data)
+                        activity?.applicationContext?.let { it1 ->
+                            ImageManager(it1, "movie", "poster_${data.id}")
+                                .downloadImage("https://image.tmdb.org/t/p/w185${data.posterPath}")
+
+                            ImageManager(it1, "movie", "back_${data.id}")
+                                .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
                         }
                     }
                 }
-                MainPagerAdapter.TYPE_TV -> {
-                    view.sheet_title.text = getTitle((data as TVShow).originalLanguage, data.originalName, data.name)
-                    view.sheet_year.text = data.firstAirDate?.subSequence(0..3)
-                    if (isFavorite(type, data))
-                        view.btn_fav.text = resources.getString(R.string.del_from_fav)
-                    else view.btn_fav.text = resources.getString(R.string.add_to_fav)
 
-                    view.btn_fav.setOnClickListener {
-                        if (isFavorite(type, data)) {
-                            viewModel.deleteTV(data)
-                            activity?.applicationContext?.let { it1 ->
-                                ImageManager(it1, "tv_show", "poster_${data.id}").deleteImage()
-                                ImageManager(it1, "tv_show", "back_${data.id}").deleteImage()
-                            }
-                        } else {
-                            viewModel.insertTV(data)
-                            activity?.applicationContext?.let { it1 ->
-                                ImageManager(it1, "tv_show", "poster_${data.id}")
-                                    .downloadImage("https://image.tmdb.org/t/p/w185${data.posterPath}")
-
-                                ImageManager(it1, "tv_show", "back_${data.id}")
-                                    .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
-                            }
-
-                        }
-                    }
+                view.btn_share.setOnClickListener {
+                    val sendIntent = Intent()
+                    sendIntent.action = Intent.ACTION_SEND
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, "https://www.themoviedb.org/movie/${data.id}")
+                    sendIntent.type = "text/plain"
+                    startActivity(sendIntent)
                 }
             }
+            MainPagerAdapter.TYPE_TV -> {
+                Glide.with(this)
+                    .load("https://image.tmdb.org/t/p/w154${(data as TVShow).posterPath}")
+                    .apply(options)
+                    .into(view.sheet_poster)
+
+                view.sheet_title.text = getTitle(data.originalLanguage, data.originalName, data.name)
+                view.sheet_year.text = data.firstAirDate?.subSequence(0..3)
+                if (isFavorite(type, data)) view.btn_fav.text = resources.getString(R.string.del_from_fav)
+                else view.btn_fav.text = resources.getString(R.string.add_to_fav)
+
+                view.btn_fav.setOnClickListener {
+                    if (isFavorite(type, data)) {
+                        viewModel.deleteTV(data)
+                        activity?.applicationContext?.let { it1 ->
+                            ImageManager(it1, "tv_show", "poster_${data.id}").deleteImage()
+                            ImageManager(it1, "tv_show", "back_${data.id}").deleteImage()
+                        }
+                    } else {
+                        viewModel.insertTV(data)
+                        activity?.applicationContext?.let { it1 ->
+                            ImageManager(it1, "tv_show", "poster_${data.id}")
+                                .downloadImage("https://image.tmdb.org/t/p/w185${data.posterPath}")
+
+                            ImageManager(it1, "tv_show", "back_${data.id}")
+                                .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
+                        }
+                    }
+                }
+
+                view.btn_share.setOnClickListener {
+                    val sendIntent = Intent()
+                    sendIntent.action = Intent.ACTION_SEND
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, "https://www.themoviedb.org/tv/${data.id}")
+                    sendIntent.type = "text/plain"
+                    startActivity(sendIntent)
+                }
+            }
+        }
         dialog?.show()
     }
 
