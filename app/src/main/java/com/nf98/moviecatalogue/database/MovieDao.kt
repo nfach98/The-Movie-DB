@@ -1,5 +1,6 @@
 package com.nf98.moviecatalogue.database
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.nf98.moviecatalogue.api.model.Movie
@@ -9,7 +10,7 @@ import com.nf98.moviecatalogue.api.model.TVShow
 interface MovieDao {
     //movie
     @Insert
-    suspend fun insertMovie(movie: Movie)
+    fun insertMovie(movie: Movie): Long
 
     @Delete
     suspend fun deleteMovie(movie: Movie)
@@ -20,9 +21,15 @@ interface MovieDao {
     @Query("select * from movie where id = :id limit 1")
     fun getMovie(id: Int): LiveData<Movie>
 
+    @Query("select * from movie order by rowid")
+    fun getMovies(): Cursor
+
+    @Query("delete from movie where id = :id")
+    fun deleteMovie(id: Long): Int
+
     //tvShow
     @Insert
-    suspend fun insertTVShow(tvShow: TVShow)
+    fun insertTVShow(tvShow: TVShow): Long
 
     @Delete
     suspend fun deleteTVShow(tvShow: TVShow)
@@ -32,4 +39,10 @@ interface MovieDao {
 
     @Query("select * from tv_show where id = :id limit 1")
     fun getTVShow(id: Int): LiveData<TVShow>
+
+    @Query("select * from tv_show order by rowid")
+    fun getTVShows(): Cursor
+
+    @Query("delete from tv_show where id = :id")
+    fun deleteTVShow(id: Long): Int
 }

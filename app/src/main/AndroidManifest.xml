@@ -4,19 +4,28 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <permission android:name="com.nf98.moviecatalogue.READ_DATABASE" android:protectionLevel="normal"/>
+    <permission android:name="com.nf98.moviecatalogue.WRITE_DATABASE" android:protectionLevel="normal"/>
 
     <application
+        android:name=".api.ApiMain"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".api.ApiMain"
         android:theme="@style/AppTheme">
-        <activity android:name="com.nf98.moviecatalogue.app.detail.DetailActivity"/>
-        <activity android:name="com.nf98.moviecatalogue.app.main.MainActivity">
+        <provider
+            android:name=".provider.MovieProvider"
+            android:authorities="com.nf98.moviecatalogue"
+            android:enabled="true"
+            android:exported="true"></provider>
+
+        <activity android:name=".app.detail.DetailActivity" />
+        <activity android:name=".app.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

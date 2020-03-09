@@ -1,6 +1,7 @@
 package com.nf98.moviecatalogue.database
 
 import android.content.Context
+import android.net.Uri
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -27,5 +28,10 @@ abstract class MovieDatabase : RoomDatabase() {
                     "MovieDB"
                 ).build()
             }
+
+        val CONTENT_URI = Uri.Builder().scheme("content")
+            .authority("com.nf98.moviecatalogue")
+            .appendPath("fav")
+            .build()
     }
 }

@@ -1,10 +1,16 @@
 package com.nf98.moviecatalogue.api.model
 
+import android.content.ContentValues
 import android.os.Parcelable
-import androidx.room.*
+import androidx.annotation.Nullable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
+
 
 @Parcelize
 @Entity(tableName = "movie")
@@ -95,4 +101,43 @@ data class Movie(
     @SerializedName("release_date")
     @Expose
     @ColumnInfo(name = "release_date")
-    var releaseDate: String? = null) : Parcelable
+    var releaseDate: String? = null) : Parcelable {
+
+    companion object{
+        const val POPULARITY = "popularity"
+        const val VOTE_COUNT = "vote_count"
+        const val DURATION = "duration"
+        const val ID = "id"
+        const val ORI_LANGUAGE = "original_language"
+        const val ORI_TITLE = "original_title"
+        const val GENRES = "genres"
+        const val TITLE = "title"
+        const val STATUS = "status"
+        const val BUDGET = "budget"
+        const val REVENUE = "revenue"
+        const val SCORE = "vote_average"
+        const val OVERVIEW = "overview"
+        const val RELEASE_DATE = "release_date"
+
+        fun fromContentValues(@Nullable values: ContentValues?): Movie {
+            val movie = Movie()
+            if(values != null){
+                if (values.containsKey(ID)) movie.id = values.getAsInteger(ID)
+                if (values.containsKey(POPULARITY)) movie.popularity = values.getAsFloat(POPULARITY)
+                if (values.containsKey(VOTE_COUNT)) movie.voteCount = values.getAsInteger(VOTE_COUNT)
+                if (values.containsKey(DURATION)) movie.duration = values.getAsInteger(DURATION)
+                if (values.containsKey(ORI_LANGUAGE)) movie.originalLanguage = values.getAsString(ORI_LANGUAGE)
+                if (values.containsKey(ORI_TITLE)) movie.originalTitle = values.getAsString(ORI_TITLE)
+                if (values.containsKey(GENRES)) movie.genres = values.get(GENRES) as List<Genre>
+                if (values.containsKey(TITLE)) movie.title = values.getAsString(TITLE)
+                if (values.containsKey(STATUS)) movie.status = values.getAsString(STATUS)
+                if (values.containsKey(BUDGET)) movie.budget = values.getAsInteger(BUDGET)
+                if (values.containsKey(REVENUE)) movie.revenue = values.getAsInteger(REVENUE)
+                if (values.containsKey(SCORE)) movie.score = values.getAsFloat(SCORE)
+                if (values.containsKey(OVERVIEW)) movie.overview = values.getAsString(OVERVIEW)
+                if (values.containsKey(RELEASE_DATE)) movie.releaseDate = values.getAsString(RELEASE_DATE)
+            }
+            return movie
+        }
+    }
+}

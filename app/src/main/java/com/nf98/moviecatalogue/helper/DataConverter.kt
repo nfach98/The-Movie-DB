@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken
 import com.nf98.moviecatalogue.api.model.Genre
 import java.lang.reflect.Type
 
-
 class DataConverter {
     @TypeConverter
     fun convertGenres(genres: List<Genre>?): String? {

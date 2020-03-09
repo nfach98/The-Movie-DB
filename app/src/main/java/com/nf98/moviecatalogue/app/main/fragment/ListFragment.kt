@@ -3,6 +3,7 @@ package com.nf98.moviecatalogue.app.main.fragment
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,6 +14,9 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.CursorLoader
+import androidx.loader.content.Loader
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -27,6 +31,7 @@ import com.nf98.moviecatalogue.app.main.MainPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainViewModel
 import com.nf98.moviecatalogue.helper.ImageManager
 import com.nf98.moviecatalogue.helper.Inject
+import com.nf98.moviecatalogue.provider.MovieProvider
 import kotlinx.android.synthetic.main.fragment_list.*
 import kotlinx.android.synthetic.main.layout_main_bottom_sheet.view.*
 import java.io.File
@@ -41,6 +46,36 @@ class ListFragment : Fragment() {
     private var index = 0
 
     private var dbList = ArrayList<Any>()
+    private var db: Cursor? = null
+
+    private val loaderCallback = object : LoaderManager.LoaderCallbacks<Cursor>{
+        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
+            return when(id){
+                MovieProvider.MOVIE -> activity?.applicationContext?.let {
+                    CursorLoader(it, MovieProvider.URI_MOVIE, arrayOf(Movie.VOTE_COUNT, Movie.TITLE, Movie.STATUS, Movie.SCORE, Movie.REVENUE,
+                        Movie.RELEASE_DATE, Movie.OVERVIEW, Movie.ORI_TITLE, Movie.ORI_LANGUAGE, Movie.GENRES,
+                        Movie.DURATION, Movie.BUDGET, Movie.POPULARITY, Movie.ID),
+                        null, null, null)
+                }!!
+                MovieProvider.TV -> activity?.applicationContext?.let {
+                    CursorLoader(it, MovieProvider.URI_TV, arrayOf(TVShow.FIRST_AIR_DATE, TVShow.GENRES, TVShow.ID, TVShow.NAME, TVShow.NUM_SEASONS,
+                        TVShow.ORI_LANGUAGE,TVShow.ORI_NAME, TVShow.OVERVIEW, TVShow.POPULARITY, TVShow.RUNTIMES,
+                        TVShow.SCORE, TVShow.STATUS, TVShow.VOTE_COUNT),
+                        null, null, null)
+                }!!
+                else -> throw IllegalArgumentException("Invalid type")
+            }
+        }
+
+        override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
+            db = data
+        }
+
+        override fun onLoaderReset(loader: Loader<Cursor>) {
+            db = null
+        }
+
+    }
 
     companion object {
         private const val ARG_SECTION_NUMBER = "section_number"
@@ -209,12 +244,11 @@ class ListFragment : Fragment() {
         tableDisc.visibility = View.GONE
         when(type){
             MainPagerAdapter.TYPE_MOVIE -> {
+                LoaderManager.getInstance(this).initLoader(MovieProvider.MOVIE, null, loaderCallback)
                 val adapter = activity?.applicationContext?.let { FavoriteAdapter(it) }
                 adapter?.notifyDataSetChanged()
                 rvList.adapter = adapter
-                viewModel.getMovieList().observe(this, Observer {
-                    if(it != null) { adapter?.setData(ArrayList(it)) }
-                })
+                adapter?.setData(dbList)
 
                 adapter?.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) {
@@ -225,15 +259,13 @@ class ListFragment : Fragment() {
                 adapter?.setShowSheetCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) { showBottomSheet(MainPagerAdapter.TYPE_MOVIE, data) }
                 })
-                showLoading(false)
             }
             MainPagerAdapter.TYPE_TV -> {
+                LoaderManager.getInstance(this).initLoader(MovieProvider.TV, null, loaderCallback)
                 val adapter = activity?.applicationContext?.let { FavoriteAdapter(it) }
                 adapter?.notifyDataSetChanged()
                 rvList.adapter = adapter
-                viewModel.getTVList().observe(this, Observer {
-                    if(it != null) adapter?.setData(ArrayList(it))
-                })
+                adapter?.setData(dbList)
 
                 adapter?.setOnItemClickCallback(object : FavoriteAdapter.OnItemClickCallback {
                     override fun onItemClicked(data: Any) {
@@ -242,11 +274,11 @@ class ListFragment : Fragment() {
                 })
 
                 adapter?.setShowSheetCallback(object : FavoriteAdapter.OnItemClickCallback {
-                    override fun onItemClicked(data: Any) { showBottomSheet(MainPagerAdapter.TYPE_TV, data) }
+                    override fun onItemClicked(data: Any) { showBottomSheet(MainPagerAdapter.TYPE_MOVIE, data) }
                 })
-                showLoading(false)
             }
         }
+        showLoading(false)
     }
 
     private fun toDetail(type: Int, data: Any, favorite: Boolean = false) {

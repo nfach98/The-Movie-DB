@@ -1,6 +1,8 @@
 package com.nf98.moviecatalogue.api.model
 
+import android.content.ContentValues
 import android.os.Parcelable
+import androidx.annotation.Nullable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -101,4 +103,41 @@ data class TVShow (
     @SerializedName("status")
     @Expose
     @ColumnInfo(name = "status")
-    var status : String? = null) : Parcelable
+    var status : String? = null) : Parcelable {
+
+    companion object{
+        const val RUNTIMES = "run_times"
+        const val ORI_NAME = "original_name"
+        const val GENRES = "genres"
+        const val NUM_SEASONS = "number_of_seasons"
+        const val NAME = "name"
+        const val POPULARITY = "popularity"
+        const val VOTE_COUNT = "vote_count"
+        const val FIRST_AIR_DATE = "first_air_date"
+        const val ORI_LANGUAGE = "original_language"
+        const val ID = "id"
+        const val SCORE = "vote_average"
+        const val OVERVIEW = "overview"
+        const val STATUS = "status"
+
+        fun fromContentValues(@Nullable values: ContentValues?): TVShow {
+            val tvShow = TVShow()
+            if(values != null){
+                if (values.containsKey(ID)) tvShow.id = values.getAsInteger(ID)
+                if (values.containsKey(POPULARITY)) tvShow.popularity = values.getAsFloat(POPULARITY)
+                if (values.containsKey(VOTE_COUNT)) tvShow.voteCount = values.getAsInteger(VOTE_COUNT)
+                if (values.containsKey(NUM_SEASONS)) tvShow.number_of_seasons = values.getAsInteger(NUM_SEASONS)
+                if (values.containsKey(RUNTIMES)) tvShow.duration = values.get(RUNTIMES) as List<Int>
+                if (values.containsKey(ORI_LANGUAGE)) tvShow.originalLanguage = values.getAsString(ORI_LANGUAGE)
+                if (values.containsKey(ORI_NAME)) tvShow.originalName = values.getAsString(ORI_NAME)
+                if (values.containsKey(GENRES)) tvShow.genres = values.get(GENRES) as List<Genre>
+                if (values.containsKey(NAME)) tvShow.name = values.getAsString(NAME)
+                if (values.containsKey(STATUS)) tvShow.status = values.getAsString(STATUS)
+                if (values.containsKey(SCORE)) tvShow.score = values.getAsFloat(SCORE)
+                if (values.containsKey(OVERVIEW)) tvShow.overview = values.getAsString(OVERVIEW)
+                if (values.containsKey(FIRST_AIR_DATE)) tvShow.firstAirDate = values.getAsString(FIRST_AIR_DATE)
+            }
+            return tvShow
+        }
+    }
+}
