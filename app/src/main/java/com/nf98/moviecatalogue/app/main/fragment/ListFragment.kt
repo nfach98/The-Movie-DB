@@ -1,6 +1,9 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +29,7 @@ import com.nf98.moviecatalogue.helper.ImageManager
 import com.nf98.moviecatalogue.helper.Inject
 import kotlinx.android.synthetic.main.fragment_list.*
 import kotlinx.android.synthetic.main.layout_main_bottom_sheet.view.*
+import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -297,15 +301,27 @@ class ListFragment : Fragment() {
         val options = RequestOptions()
             .placeholder(R.drawable.img_poster_na)
             .error(R.drawable.img_poster_na)
+        val wrapper = ContextWrapper(context)
 
         dialog?.setContentView(view)
         dialog?.window?.decorView?.findViewById<View>(R.id.design_bottom_sheet)?.setBackgroundResource(android.R.color.transparent)
         when (type) {
             MainPagerAdapter.TYPE_MOVIE -> {
-                Glide.with(this)
-                    .load("https://image.tmdb.org/t/p/w154${(data as Movie).posterPath}")
-                    .apply(options)
-                    .into(view.sheet_poster)
+                if(index == 10){
+                    var poster = wrapper.getDir("movie", Context.MODE_PRIVATE)
+                    poster = File(poster, "poster_${(data as Movie).id}.jpg")
+
+                    Glide.with(this)
+                        .load(Uri.fromFile(poster))
+                        .apply(options)
+                        .into(view.sheet_poster)
+                }
+                else {
+                    Glide.with(this)
+                        .load("https://image.tmdb.org/t/p/w154${(data as Movie).posterPath}")
+                        .apply(options)
+                        .into(view.sheet_poster)
+                }
 
                 view.sheet_title.text = getTitle(data.originalLanguage, data.originalTitle, data.title)
                 view.sheet_year.text = data.releaseDate?.subSequence(0..3)
@@ -314,6 +330,7 @@ class ListFragment : Fragment() {
                 else view.btn_fav.text = resources.getString(R.string.add_to_fav)
 
                 view.btn_fav.setOnClickListener {
+                    dialog?.dismiss()
                     if (isFavorite(type, data)) {
                         viewModel.deleteMovie(data)
                         activity?.applicationContext?.let { it1 ->
@@ -330,9 +347,12 @@ class ListFragment : Fragment() {
                                 .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
                         }
                     }
+                    updateFavorite(MainPagerAdapter.TYPE_MOVIE)
+                    getDb(MainPagerAdapter.TYPE_MOVIE)
                 }
 
                 view.btn_share.setOnClickListener {
+                    dialog?.dismiss()
                     val sendIntent = Intent()
                     sendIntent.action = Intent.ACTION_SEND
                     sendIntent.putExtra(Intent.EXTRA_TEXT, "https://www.themoviedb.org/movie/${data.id}")
@@ -341,10 +361,21 @@ class ListFragment : Fragment() {
                 }
             }
             MainPagerAdapter.TYPE_TV -> {
-                Glide.with(this)
-                    .load("https://image.tmdb.org/t/p/w154${(data as TVShow).posterPath}")
-                    .apply(options)
-                    .into(view.sheet_poster)
+                if(index == 11){
+                    var poster = wrapper.getDir("tv_show", Context.MODE_PRIVATE)
+                    poster = File(poster, "poster_${(data as TVShow).id}.jpg")
+
+                    Glide.with(this)
+                        .load(Uri.fromFile(poster))
+                        .apply(options)
+                        .into(view.sheet_poster)
+                }
+                else {
+                    Glide.with(this)
+                        .load("https://image.tmdb.org/t/p/w154${(data as TVShow).posterPath}")
+                        .apply(options)
+                        .into(view.sheet_poster)
+                }
 
                 view.sheet_title.text = getTitle(data.originalLanguage, data.originalName, data.name)
                 view.sheet_year.text = data.firstAirDate?.subSequence(0..3)
@@ -352,6 +383,7 @@ class ListFragment : Fragment() {
                 else view.btn_fav.text = resources.getString(R.string.add_to_fav)
 
                 view.btn_fav.setOnClickListener {
+                    dialog?.dismiss()
                     if (isFavorite(type, data)) {
                         viewModel.deleteTV(data)
                         activity?.applicationContext?.let { it1 ->
@@ -368,9 +400,12 @@ class ListFragment : Fragment() {
                                 .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
                         }
                     }
+                    updateFavorite(MainPagerAdapter.TYPE_TV)
+                    getDb(MainPagerAdapter.TYPE_TV)
                 }
 
                 view.btn_share.setOnClickListener {
+                    dialog?.dismiss()
                     val sendIntent = Intent()
                     sendIntent.action = Intent.ACTION_SEND
                     sendIntent.putExtra(Intent.EXTRA_TEXT, "https://www.themoviedb.org/tv/${data.id}")
