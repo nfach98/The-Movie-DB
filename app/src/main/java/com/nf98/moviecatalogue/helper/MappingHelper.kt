@@ -1,6 +1,7 @@
 package com.nf98.moviecatalogue.helper
 
 import android.database.Cursor
+import android.util.Log
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 

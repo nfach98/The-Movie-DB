@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -72,7 +71,7 @@ class ListFragment : Fragment() {
                         null, null, null)
                 }!!
                 MovieProvider.TV -> activity?.applicationContext?.let {
-                    CursorLoader(it, MovieProvider.URI_TV, arrayOf(TVShow.FIRST_AIR_DATE, TVShow.GENRES, TVShow.ID, TVShow.NAME, TVShow.NUM_SEASONS,
+                    CursorLoader(it, URI_TV, arrayOf(TVShow.FIRST_AIR_DATE, TVShow.GENRES, TVShow.ID, TVShow.NAME, TVShow.NUM_SEASONS,
                         TVShow.ORI_LANGUAGE,TVShow.ORI_NAME, TVShow.OVERVIEW, TVShow.POPULARITY, TVShow.RUNTIMES,
                         TVShow.SCORE, TVShow.STATUS, TVShow.VOTE_COUNT),
                         null, null, null)
@@ -111,6 +110,7 @@ class ListFragment : Fragment() {
         }
 
         override fun onLoaderReset(loader: Loader<Cursor>) {
+            dbList.clear()
         }
 
     }
@@ -138,23 +138,6 @@ class ListFragment : Fragment() {
 
         viewModelFactory = activity?.let { Inject.provideViewModelFactory(it) }!!
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-
-        val handlerThread = HandlerThread("DataObserver")
-        handlerThread.start()
-        val handler = Handler(handlerThread.looper)
-        val myObserver = object : ContentObserver(handler) {
-            override fun onChange(self: Boolean) {
-                when(index){
-                    in 0..3, 8, 10 -> getDb(MainPagerAdapter.TYPE_MOVIE)
-                    in 4..7, 9, 11 -> getDb(MainPagerAdapter.TYPE_TV)
-                }
-            }
-        }
-
-        when(index) {
-            in 0..3, 8, 10 -> context?.contentResolver?.registerContentObserver(CONTENT_MOVIE, true, myObserver)
-            in 4..7, 9, 11 -> context?.contentResolver?.registerContentObserver(CONTENT_TV, true, myObserver)
-        }
 
         showLoading(true)
         rvList.layoutManager = LinearLayoutManager(activity)
@@ -185,24 +168,14 @@ class ListFragment : Fragment() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        Inject.closeDatabase()
-    }
-
     private fun getDb(type: Int){
         when(type){
             MainPagerAdapter.TYPE_MOVIE -> {
-                GlobalScope.launch(Dispatchers.Main) {
-                    val deferredMovies = async(Dispatchers.IO) {
-                        val data = context?.contentResolver?.query(URI_MOVIE, null, null, null, null)
-                        MappingHelper.mapCursorToMovieList(data)
-                    }
-                    val movies = deferredMovies.await()
-                    if (movies.size > 0) {
-                        dbList.clear()
-                        dbList.addAll(movies)
-                    }
+                val data = context?.contentResolver?.query(URI_MOVIE, null, null, null, null)
+                val movies = MappingHelper.mapCursorToMovieList(data)
+                if (movies.size > 0) {
+                    dbList.clear()
+                    dbList.addAll(movies)
                 }
 //                LoaderManager.getInstance(this).initLoader(MovieProvider.MOVIE, null, loaderCallback)
             }
@@ -221,16 +194,6 @@ class ListFragment : Fragment() {
 //                LoaderManager.getInstance(this).initLoader(MovieProvider.TV, null, loaderCallback)
             }
         }
-    }
-
-    private fun getMovie(id: Int): Movie{
-        var data = Movie()
-        viewModel.getMovie(id).observe(this, Observer {
-            if (it != null) { data = it }
-            Log.d("MovieDB", "$id")
-        })
-
-        return data
     }
 
     private fun isFavorite(type: Int, data: Any): Boolean{
@@ -348,7 +311,7 @@ class ListFragment : Fragment() {
                 })
 
                 adapter?.setShowSheetCallback(object : FavoriteAdapter.OnItemClickCallback {
-                    override fun onItemClicked(data: Any) { showBottomSheet(MainPagerAdapter.TYPE_MOVIE, data) }
+                    override fun onItemClicked(data: Any) { showBottomSheet(MainPagerAdapter.TYPE_TV, data) }
                 })
             }
         }
@@ -447,21 +410,20 @@ class ListFragment : Fragment() {
                         }
                     } else {
                         val value = ContentValues()
-                        val movie = getMovie(data.id)
-                        value.put(Movie.ID, movie.id)
-                        value.put(Movie.DURATION, movie.duration)
-                        value.put(Movie.ORI_LANGUAGE, movie.originalLanguage)
-                        value.put(Movie.BUDGET, movie.budget)
-                        value.put(Movie.REVENUE, movie.revenue)
-                        value.put(Movie.ORI_TITLE, movie.originalTitle)
-                        value.put(Movie.OVERVIEW, movie.overview)
-                        value.put(Movie.GENRES, converter.convertGenres(movie.genres))
-                        value.put(Movie.POPULARITY, movie.popularity)
-                        value.put(Movie.RELEASE_DATE, movie.releaseDate)
-                        value.put(Movie.SCORE, movie.score)
-                        value.put(Movie.STATUS, movie.status)
-                        value.put(Movie.TITLE, movie.title)
-                        value.put(Movie.VOTE_COUNT, movie.voteCount)
+                        value.put(Movie.ID, data.id)
+                        value.put(Movie.DURATION, data.duration)
+                        value.put(Movie.ORI_LANGUAGE, data.originalLanguage)
+                        value.put(Movie.BUDGET, data.budget)
+                        value.put(Movie.REVENUE, data.revenue)
+                        value.put(Movie.ORI_TITLE, data.originalTitle)
+                        value.put(Movie.OVERVIEW, data.overview)
+                        value.put(Movie.GENRES, converter.convertGenres(data.genres))
+                        value.put(Movie.POPULARITY, data.popularity)
+                        value.put(Movie.RELEASE_DATE, data.releaseDate)
+                        value.put(Movie.SCORE, data.score)
+                        value.put(Movie.STATUS, data.status)
+                        value.put(Movie.TITLE, data.title)
+                        value.put(Movie.VOTE_COUNT, data.voteCount)
 
                         context?.contentResolver?.insert(CONTENT_MOVIE, value)
 
@@ -473,8 +435,6 @@ class ListFragment : Fragment() {
                                 .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
                         }
                     }
-                    updateFavorite(MainPagerAdapter.TYPE_MOVIE)
-                    getDb(MainPagerAdapter.TYPE_MOVIE)
                 }
 
                 view.btn_share.setOnClickListener {
@@ -524,8 +484,6 @@ class ListFragment : Fragment() {
                                 .downloadImage("https://image.tmdb.org/t/p/original${data.backdropPath}")
                         }
                     }
-                    updateFavorite(MainPagerAdapter.TYPE_TV)
-                    getDb(MainPagerAdapter.TYPE_TV)
                 }
 
                 view.btn_share.setOnClickListener {

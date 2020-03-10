@@ -3,12 +3,14 @@ package com.nf98.moviecatalogue.provider
 import android.content.*
 import android.database.Cursor
 import android.net.Uri
+import android.util.Log
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 import com.nf98.moviecatalogue.database.MovieDatabase
 import com.nf98.moviecatalogue.database.MovieDatabase.Companion.CONTENT_MOVIE
 import com.nf98.moviecatalogue.database.MovieDatabase.Companion.CONTENT_TV
 import com.nf98.moviecatalogue.database.MovieRepos
+import kotlinx.coroutines.*
 
 class MovieProvider : ContentProvider() {
 
@@ -19,8 +21,8 @@ class MovieProvider : ContentProvider() {
         const val MOVIE_ID = 2
         const val TV_ID = 3
 
-        val URI_MOVIE: Uri = Uri.parse("content://com.nf98.moviecatalogue/MovieDB/$MOVIE" )
-        val URI_TV: Uri = Uri.parse("content://com.nf98.moviecatalogue/MovieDB/$TV" )
+        val URI_MOVIE: Uri = Uri.parse("content://com.nf98.moviecatalogue/movie/$MOVIE" )
+        val URI_TV: Uri = Uri.parse("content://com.nf98.moviecatalogue/tv_show/$TV" )
 
         private val sUriMatcher = UriMatcher(UriMatcher.NO_MATCH)
         private lateinit var movieRepos: MovieRepos
@@ -39,11 +41,17 @@ class MovieProvider : ContentProvider() {
         var deleted = 0
             when (sUriMatcher.match(uri)) {
             MOVIE_ID ->{
-                deleted = movieDb.movieDao().deleteMovie(ContentUris.parseId(uri))
+                GlobalScope.launch{
+                    val deferred = async(Dispatchers.IO){ movieDb.movieDao().deleteMovie(ContentUris.parseId(uri)) }
+                    deleted = deferred.await()
+                }
                 context?.contentResolver?.notifyChange(CONTENT_MOVIE, null)
             }
             TV_ID ->{
-                deleted = movieDb.movieDao().deleteTVShow(ContentUris.parseId(uri))
+                GlobalScope.launch{
+                    val deferred = async(Dispatchers.IO){ movieDb.movieDao().deleteTVShow(ContentUris.parseId(uri)) }
+                    deleted = deferred.await()
+                }
                 context?.contentResolver?.notifyChange(CONTENT_TV, null)
             }
         }
@@ -56,16 +64,22 @@ class MovieProvider : ContentProvider() {
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        val added: Long
+        var added = 0L
 
         return when (sUriMatcher.match(uri)) {
             MOVIE -> {
-                added = movieDb.movieDao().insertMovie(Movie.fromContentValues(values))
+                GlobalScope.launch {
+                    val deferred = async(Dispatchers.IO){ movieDb.movieDao().insertMovie(Movie.fromContentValues(values)) }
+                    added = deferred.await()
+                }
                 context?.contentResolver?.notifyChange(CONTENT_MOVIE, null)
                 Uri.parse("$CONTENT_MOVIE/$added")
             }
             TV -> {
-                added = movieDb.movieDao().insertTVShow(TVShow.fromContentValues(values))
+                GlobalScope.launch {
+                    val deferred = async(Dispatchers.IO){ movieDb.movieDao().insertTVShow(TVShow.fromContentValues(values)) }
+                    added = deferred.await()
+                }
                 context?.contentResolver?.notifyChange(CONTENT_TV, null)
                 Uri.parse("$CONTENT_MOVIE/$added")
             }
@@ -81,9 +95,22 @@ class MovieProvider : ContentProvider() {
 
     override fun query(uri: Uri, projection: Array<String>?, selection: String?, selectionArgs: Array<String>?, sortOrder: String?): Cursor? {
         val movieDao = MovieDatabase.getDatabase(context as Context).movieDao()
+        var cursor: Cursor? = null
         return when (sUriMatcher.match(uri)) {
-            MOVIE -> movieDao.getMovies()
-            TV -> movieDao.getTVShows()
+            MOVIE -> {
+                GlobalScope.launch {
+                    val deferred = async(Dispatchers.IO) { movieDao.getMovies() }
+                    cursor = deferred.await()
+                }
+                cursor
+            }
+            TV -> {
+                GlobalScope.launch {
+                    val deferred = async(Dispatchers.IO) { movieDao.getTVShows() }
+                    cursor = deferred.await()
+                }
+                cursor
+            }
             else -> null
         }
     }
