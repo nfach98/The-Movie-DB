@@ -1,11 +1,16 @@
 package com.nf98.moviecatalogue.app.main.fragment
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,15 +34,24 @@ import com.nf98.moviecatalogue.app.ViewModelFactory
 import com.nf98.moviecatalogue.app.detail.DetailPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainPagerAdapter
 import com.nf98.moviecatalogue.app.main.MainViewModel
+import com.nf98.moviecatalogue.database.MovieDatabase.Companion.CONTENT_MOVIE
+import com.nf98.moviecatalogue.database.MovieDatabase.Companion.CONTENT_TV
+import com.nf98.moviecatalogue.helper.DataConverter
 import com.nf98.moviecatalogue.helper.ImageManager
 import com.nf98.moviecatalogue.helper.Inject
+import com.nf98.moviecatalogue.helper.MappingHelper
 import com.nf98.moviecatalogue.provider.MovieProvider
+import com.nf98.moviecatalogue.provider.MovieProvider.Companion.URI_MOVIE
+import com.nf98.moviecatalogue.provider.MovieProvider.Companion.URI_TV
 import kotlinx.android.synthetic.main.fragment_list.*
 import kotlinx.android.synthetic.main.layout_main_bottom_sheet.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
-
 
 class ListFragment : Fragment() {
 
@@ -46,7 +60,7 @@ class ListFragment : Fragment() {
     private var index = 0
 
     private var dbList = ArrayList<Any>()
-    private var db: Cursor? = null
+    private val converter = DataConverter()
 
     private val loaderCallback = object : LoaderManager.LoaderCallbacks<Cursor>{
         override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
@@ -68,11 +82,35 @@ class ListFragment : Fragment() {
         }
 
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-            db = data
+            when(index){
+                10 -> {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        val deferredMovies = async(Dispatchers.IO) {
+                            MappingHelper.mapCursorToMovieList(data)
+                        }
+                        val movies = deferredMovies.await()
+                        if (movies.size > 0) {
+                            dbList.clear()
+                            dbList.addAll(movies)
+                        }
+                    }
+                }
+                11 -> {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        val deferredTVShows = async(Dispatchers.IO) {
+                            MappingHelper.mapCursorToTVShowList(data)
+                        }
+                        val tvShows = deferredTVShows.await()
+                        if (tvShows.size > 0) {
+                            dbList.clear()
+                            dbList.addAll(tvShows)
+                        }
+                    }
+                }
+            }
         }
 
         override fun onLoaderReset(loader: Loader<Cursor>) {
-            db = null
         }
 
     }
@@ -101,38 +139,48 @@ class ListFragment : Fragment() {
         viewModelFactory = activity?.let { Inject.provideViewModelFactory(it) }!!
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
+        val handlerThread = HandlerThread("DataObserver")
+        handlerThread.start()
+        val handler = Handler(handlerThread.looper)
+        val myObserver = object : ContentObserver(handler) {
+            override fun onChange(self: Boolean) {
+                when(index){
+                    in 0..3, 8, 10 -> getDb(MainPagerAdapter.TYPE_MOVIE)
+                    in 4..7, 9, 11 -> getDb(MainPagerAdapter.TYPE_TV)
+                }
+            }
+        }
+
+        when(index) {
+            in 0..3, 8, 10 -> context?.contentResolver?.registerContentObserver(CONTENT_MOVIE, true, myObserver)
+            in 4..7, 9, 11 -> context?.contentResolver?.registerContentObserver(CONTENT_TV, true, myObserver)
+        }
+
         showLoading(true)
         rvList.layoutManager = LinearLayoutManager(activity)
         setSpinner()
     }
-
 
     override fun onStart() {
         super.onStart()
         when (index) {
             in 0..3 -> {
                 updateMovie(index)
-                getDb(MainPagerAdapter.TYPE_MOVIE)
             }
             in 4..7 -> {
                 updateTV(index)
-                getDb(MainPagerAdapter.TYPE_TV)
             }
             8 -> {
                 updateDiscover(MainPagerAdapter.TYPE_MOVIE)
-                getDb(MainPagerAdapter.TYPE_MOVIE)
             }
             9 -> {
                 updateDiscover(MainPagerAdapter.TYPE_TV)
-                getDb(MainPagerAdapter.TYPE_TV)
             }
             10 -> {
                 updateFavorite(MainPagerAdapter.TYPE_MOVIE)
-                getDb(MainPagerAdapter.TYPE_MOVIE)
             }
             11 -> {
                 updateFavorite(MainPagerAdapter.TYPE_TV)
-                getDb(MainPagerAdapter.TYPE_TV)
             }
         }
     }
@@ -145,16 +193,44 @@ class ListFragment : Fragment() {
     private fun getDb(type: Int){
         when(type){
             MainPagerAdapter.TYPE_MOVIE -> {
-                viewModel.getMovieList().observe(this, Observer {
-                    if(it != null) { dbList.addAll(it) }
-                })
+                GlobalScope.launch(Dispatchers.Main) {
+                    val deferredMovies = async(Dispatchers.IO) {
+                        val data = context?.contentResolver?.query(URI_MOVIE, null, null, null, null)
+                        MappingHelper.mapCursorToMovieList(data)
+                    }
+                    val movies = deferredMovies.await()
+                    if (movies.size > 0) {
+                        dbList.clear()
+                        dbList.addAll(movies)
+                    }
+                }
+//                LoaderManager.getInstance(this).initLoader(MovieProvider.MOVIE, null, loaderCallback)
             }
             MainPagerAdapter.TYPE_TV -> {
-                viewModel.getTVList().observe(this, Observer {
-                    if(it != null) { dbList.addAll(it) }
-                })
+                GlobalScope.launch(Dispatchers.Main) {
+                    val deferredTVShows = async(Dispatchers.IO) {
+                        val data = context?.contentResolver?.query(URI_TV, null, null, null, null)
+                        MappingHelper.mapCursorToTVShowList(data)
+                    }
+                    val tvShows = deferredTVShows.await()
+                    if (tvShows.size > 0) {
+                        dbList.clear()
+                        dbList.addAll(tvShows)
+                    }
+                }
+//                LoaderManager.getInstance(this).initLoader(MovieProvider.TV, null, loaderCallback)
             }
         }
+    }
+
+    private fun getMovie(id: Int): Movie{
+        var data = Movie()
+        viewModel.getMovie(id).observe(this, Observer {
+            if (it != null) { data = it }
+            Log.d("MovieDB", "$id")
+        })
+
+        return data
     }
 
     private fun isFavorite(type: Int, data: Any): Boolean{
@@ -244,7 +320,6 @@ class ListFragment : Fragment() {
         tableDisc.visibility = View.GONE
         when(type){
             MainPagerAdapter.TYPE_MOVIE -> {
-                LoaderManager.getInstance(this).initLoader(MovieProvider.MOVIE, null, loaderCallback)
                 val adapter = activity?.applicationContext?.let { FavoriteAdapter(it) }
                 adapter?.notifyDataSetChanged()
                 rvList.adapter = adapter
@@ -261,7 +336,6 @@ class ListFragment : Fragment() {
                 })
             }
             MainPagerAdapter.TYPE_TV -> {
-                LoaderManager.getInstance(this).initLoader(MovieProvider.TV, null, loaderCallback)
                 val adapter = activity?.applicationContext?.let { FavoriteAdapter(it) }
                 adapter?.notifyDataSetChanged()
                 rvList.adapter = adapter
@@ -364,13 +438,33 @@ class ListFragment : Fragment() {
                 view.btn_fav.setOnClickListener {
                     dialog?.dismiss()
                     if (isFavorite(type, data)) {
-                        viewModel.deleteMovie(data)
+                        val uriWithId = Uri.parse(CONTENT_MOVIE.toString() + "/" + data.id)
+                        context?.contentResolver?.delete(uriWithId, null, null)
+
                         activity?.applicationContext?.let { it1 ->
                             ImageManager(it1, "movie", "poster_${data.id}").deleteImage()
                             ImageManager(it1, "movie", "back_${data.id}").deleteImage()
                         }
                     } else {
-                        viewModel.insertMovie(data)
+                        val value = ContentValues()
+                        val movie = getMovie(data.id)
+                        value.put(Movie.ID, movie.id)
+                        value.put(Movie.DURATION, movie.duration)
+                        value.put(Movie.ORI_LANGUAGE, movie.originalLanguage)
+                        value.put(Movie.BUDGET, movie.budget)
+                        value.put(Movie.REVENUE, movie.revenue)
+                        value.put(Movie.ORI_TITLE, movie.originalTitle)
+                        value.put(Movie.OVERVIEW, movie.overview)
+                        value.put(Movie.GENRES, converter.convertGenres(movie.genres))
+                        value.put(Movie.POPULARITY, movie.popularity)
+                        value.put(Movie.RELEASE_DATE, movie.releaseDate)
+                        value.put(Movie.SCORE, movie.score)
+                        value.put(Movie.STATUS, movie.status)
+                        value.put(Movie.TITLE, movie.title)
+                        value.put(Movie.VOTE_COUNT, movie.voteCount)
+
+                        context?.contentResolver?.insert(CONTENT_MOVIE, value)
+
                         activity?.applicationContext?.let { it1 ->
                             ImageManager(it1, "movie", "poster_${data.id}")
                                 .downloadImage("https://image.tmdb.org/t/p/w185${data.posterPath}")
@@ -417,13 +511,11 @@ class ListFragment : Fragment() {
                 view.btn_fav.setOnClickListener {
                     dialog?.dismiss()
                     if (isFavorite(type, data)) {
-                        viewModel.deleteTV(data)
                         activity?.applicationContext?.let { it1 ->
                             ImageManager(it1, "tv_show", "poster_${data.id}").deleteImage()
                             ImageManager(it1, "tv_show", "back_${data.id}").deleteImage()
                         }
                     } else {
-                        viewModel.insertTV(data)
                         activity?.applicationContext?.let { it1 ->
                             ImageManager(it1, "tv_show", "poster_${data.id}")
                                 .downloadImage("https://image.tmdb.org/t/p/w185${data.posterPath}")

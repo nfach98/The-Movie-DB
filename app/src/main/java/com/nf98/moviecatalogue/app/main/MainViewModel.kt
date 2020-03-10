@@ -42,6 +42,9 @@ class MainViewModel(private val movieRepos: MovieRepos) : ViewModel() {
     val listMovie = MutableLiveData<ArrayList<Movie>>()
     val listTVShow = MutableLiveData<ArrayList<TVShow>>()
 
+    val movie = MutableLiveData<Movie>()
+    val tvShow = MutableLiveData<TVShow>()
+
     @JvmOverloads
     internal fun getMovieList(index: Int,
                               year: Int = Calendar.getInstance().get(Calendar.YEAR),
@@ -88,18 +91,19 @@ class MainViewModel(private val movieRepos: MovieRepos) : ViewModel() {
         return listMovie
     }
 
-    fun getMovieList(): LiveData<List<Movie>> = movieRepos.getAllMovie()
+    internal fun getMovie(id: Int): LiveData<Movie> {
+        val result = ApiMain().services.getMovie(id)
 
-    internal fun insertMovie(movie: Movie){
-        viewModelScope.launch {
-            movieRepos.insert(movie)
-        }
-    }
-
-    fun deleteMovie(movie: Movie){
-        viewModelScope.launch {
-            movieRepos.delete(movie)
-        }
+        result.enqueue(object : Callback<Movie> {
+            override fun onResponse(call: Call<Movie>, response: Response<Movie>) {
+                if(response.isSuccessful)
+                    response.body().let { movie.postValue(it) }
+            }
+            override fun onFailure(call: Call<Movie>, t: Throwable) {
+                Log.d("MovieDB", t.message)
+            }
+        })
+        return movie
     }
 
     @JvmOverloads
@@ -137,18 +141,19 @@ class MainViewModel(private val movieRepos: MovieRepos) : ViewModel() {
         return listTVShow
     }
 
-    fun getTVList(): LiveData<List<TVShow>> = movieRepos.getAllTVShow()
+    internal fun getTVShow(id: Int): LiveData<TVShow> {
+        val result = ApiMain().services.getTVShow(id)
 
-    internal fun insertTV(tvShow: TVShow){
-        viewModelScope.launch {
-            movieRepos.insert(tvShow)
-        }
-    }
-
-    fun deleteTV(tvShow: TVShow){
-        viewModelScope.launch {
-            movieRepos.delete(tvShow)
-        }
+        result.enqueue(object : Callback<TVShow> {
+            override fun onResponse(call: Call<TVShow>, response: Response<TVShow>) {
+                if(response.isSuccessful)
+                    response.body().let { tvShow.postValue(it) }
+            }
+            override fun onFailure(call: Call<TVShow>, t: Throwable) {
+                Log.d("MovieDB", t.message)
+            }
+        })
+        return tvShow
     }
 
     internal fun getYearList(): ArrayList<String> {

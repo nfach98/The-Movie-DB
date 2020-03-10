@@ -1,8 +1,8 @@
 package com.nf98.moviecatalogue.helper
 
 import android.database.Cursor
-import com.nf98.moviecatalogue.api.model.Genre
 import com.nf98.moviecatalogue.api.model.Movie
+import com.nf98.moviecatalogue.api.model.TVShow
 
 object MappingHelper {
 
@@ -59,5 +59,59 @@ object MappingHelper {
                 score = score, overview = overview, releaseDate = date)
         }
         return movie
+    }
+
+
+    fun mapCursorToTVShowList(cursor: Cursor?): ArrayList<TVShow> {
+        val list = ArrayList<TVShow>()
+
+        cursor?.apply {
+            while (moveToNext()) {
+                val id = getInt(getColumnIndexOrThrow(TVShow.ID))
+                val popularity = getFloat(getColumnIndexOrThrow(TVShow.POPULARITY))
+                val voteCount = getInt(getColumnIndexOrThrow(TVShow.VOTE_COUNT))
+                val duration = getString(getColumnIndexOrThrow(TVShow.RUNTIMES))
+                val originalLanguage = getString(getColumnIndexOrThrow(TVShow.ORI_LANGUAGE))
+                val originalName = getString(getColumnIndexOrThrow(TVShow.ORI_NAME))
+                val genres = getString(getColumnIndexOrThrow(TVShow.GENRES))
+                val name = getString(getColumnIndexOrThrow(TVShow.NAME))
+                val status = getString(getColumnIndexOrThrow(TVShow.STATUS))
+                val score = getFloat(getColumnIndexOrThrow(TVShow.SCORE))
+                val overview = getString(getColumnIndexOrThrow(TVShow.OVERVIEW))
+                val date = getString(getColumnIndexOrThrow(TVShow.FIRST_AIR_DATE))
+                val numSeasons = getInt(getColumnIndexOrThrow(TVShow.NUM_SEASONS))
+                list.add(
+                    TVShow(id = id, popularity = popularity, voteCount = voteCount, duration = converter.getTVDuration(duration), originalLanguage = originalLanguage,
+                    originalName = originalName, genres = converter.getGenres(genres), name = name, status = status, number_of_seasons = numSeasons,
+                    score = score, overview = overview, firstAirDate = date)
+                )
+            }
+        }
+        return list
+    }
+
+    fun mapCursorToTVShow(cursor: Cursor?): TVShow {
+        var tvShow = TVShow()
+
+        cursor?.apply {
+            moveToFirst()
+            val id = getInt(getColumnIndexOrThrow(TVShow.ID))
+            val popularity = getFloat(getColumnIndexOrThrow(TVShow.POPULARITY))
+            val voteCount = getInt(getColumnIndexOrThrow(TVShow.VOTE_COUNT))
+            val duration = getString(getColumnIndexOrThrow(TVShow.RUNTIMES))
+            val originalLanguage = getString(getColumnIndexOrThrow(TVShow.ORI_LANGUAGE))
+            val originalName = getString(getColumnIndexOrThrow(TVShow.ORI_NAME))
+            val genres = getString(getColumnIndexOrThrow(TVShow.GENRES))
+            val name = getString(getColumnIndexOrThrow(TVShow.NAME))
+            val status = getString(getColumnIndexOrThrow(TVShow.STATUS))
+            val score = getFloat(getColumnIndexOrThrow(TVShow.SCORE))
+            val overview = getString(getColumnIndexOrThrow(TVShow.OVERVIEW))
+            val date = getString(getColumnIndexOrThrow(TVShow.FIRST_AIR_DATE))
+            val numSeasons = getInt(getColumnIndexOrThrow(TVShow.NUM_SEASONS))
+            tvShow = TVShow(id = id, popularity = popularity, voteCount = voteCount, duration = converter.getTVDuration(duration), originalLanguage = originalLanguage,
+                originalName = originalName, genres = converter.getGenres(genres), name = name, status = status, number_of_seasons = numSeasons,
+                score = score, overview = overview, firstAirDate = date)
+        }
+        return tvShow
     }
 }

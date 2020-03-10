@@ -55,8 +55,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
     //UI
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation "com.google.android.material:material:$rootProject.materialVersion"
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.lzyzsd:circleprogress:1.2.1'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.dominicg666:WrappingViewPager:1.2'

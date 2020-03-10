@@ -6,9 +6,9 @@ import android.net.Uri
 import com.nf98.moviecatalogue.api.model.Movie
 import com.nf98.moviecatalogue.api.model.TVShow
 import com.nf98.moviecatalogue.database.MovieDatabase
-import com.nf98.moviecatalogue.database.MovieDatabase.Companion.CONTENT_URI
+import com.nf98.moviecatalogue.database.MovieDatabase.Companion.CONTENT_MOVIE
+import com.nf98.moviecatalogue.database.MovieDatabase.Companion.CONTENT_TV
 import com.nf98.moviecatalogue.database.MovieRepos
-import com.nf98.moviecatalogue.helper.Inject
 
 class MovieProvider : ContentProvider() {
 
@@ -16,8 +16,11 @@ class MovieProvider : ContentProvider() {
         const val MOVIE = 0
         const val TV = 1
 
-        val URI_MOVIE = Uri.parse("content://com.nf98.moviecatalogue/fav/$MOVIE" )
-        val URI_TV = Uri.parse("content://com.nf98.moviecatalogue/fav/$TV" )
+        const val MOVIE_ID = 2
+        const val TV_ID = 3
+
+        val URI_MOVIE: Uri = Uri.parse("content://com.nf98.moviecatalogue/MovieDB/$MOVIE" )
+        val URI_TV: Uri = Uri.parse("content://com.nf98.moviecatalogue/MovieDB/$TV" )
 
         private val sUriMatcher = UriMatcher(UriMatcher.NO_MATCH)
         private lateinit var movieRepos: MovieRepos
@@ -25,18 +28,26 @@ class MovieProvider : ContentProvider() {
     }
 
     init {
-        sUriMatcher.addURI("com.nf98.moviecatalogue", "fav", MOVIE)
-        sUriMatcher.addURI("com.nf98.moviecatalogue", "fav", TV)
+        sUriMatcher.addURI("com.nf98.moviecatalogue", "movie", MOVIE)
+        sUriMatcher.addURI("com.nf98.moviecatalogue", "tv_show", TV)
+
+        sUriMatcher.addURI("com.nf98.moviecatalogue", "movie/#", MOVIE_ID)
+        sUriMatcher.addURI("com.nf98.moviecatalogue", "tv_show/#", TV_ID)
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
-        val deleted: Int = when (sUriMatcher.match(uri)) {
-            MOVIE -> movieDb.movieDao().deleteMovie(ContentUris.parseId(uri))
-            TV -> movieDb.movieDao().deleteTVShow(ContentUris.parseId(uri))
-            else -> 0
+        var deleted = 0
+            when (sUriMatcher.match(uri)) {
+            MOVIE_ID ->{
+                deleted = movieDb.movieDao().deleteMovie(ContentUris.parseId(uri))
+                context?.contentResolver?.notifyChange(CONTENT_MOVIE, null)
+            }
+            TV_ID ->{
+                deleted = movieDb.movieDao().deleteTVShow(ContentUris.parseId(uri))
+                context?.contentResolver?.notifyChange(CONTENT_TV, null)
+            }
         }
 
-        context?.contentResolver?.notifyChange(CONTENT_URI, null)
         return deleted
     }
 
@@ -45,15 +56,21 @@ class MovieProvider : ContentProvider() {
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        val added: Long =
-            when (sUriMatcher.match(uri)) {
-                MOVIE -> movieDb.movieDao().insertMovie(Movie.fromContentValues(values))
-                TV -> movieDb.movieDao().insertTVShow(TVShow.fromContentValues(values))
-                else -> 0
-            }
+        val added: Long
 
-        context?.contentResolver?.notifyChange(CONTENT_URI, null)
-        return Uri.parse("$CONTENT_URI/$added")
+        return when (sUriMatcher.match(uri)) {
+            MOVIE -> {
+                added = movieDb.movieDao().insertMovie(Movie.fromContentValues(values))
+                context?.contentResolver?.notifyChange(CONTENT_MOVIE, null)
+                Uri.parse("$CONTENT_MOVIE/$added")
+            }
+            TV -> {
+                added = movieDb.movieDao().insertTVShow(TVShow.fromContentValues(values))
+                context?.contentResolver?.notifyChange(CONTENT_TV, null)
+                Uri.parse("$CONTENT_MOVIE/$added")
+            }
+            else -> throw IllegalArgumentException("Invalid")
+        }
     }
 
     override fun onCreate(): Boolean {
@@ -72,6 +89,6 @@ class MovieProvider : ContentProvider() {
     }
 
     override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<String>?): Int {
-        TODO("Implement this to handle requests to update one or more rows.")
+        return 0
     }
 }

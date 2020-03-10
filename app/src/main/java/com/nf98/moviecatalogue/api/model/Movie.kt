@@ -9,6 +9,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import com.nf98.moviecatalogue.helper.DataConverter
 import kotlinx.android.parcel.Parcelize
 
 
@@ -121,6 +122,7 @@ data class Movie(
 
         fun fromContentValues(@Nullable values: ContentValues?): Movie {
             val movie = Movie()
+            val converter = DataConverter()
             if(values != null){
                 if (values.containsKey(ID)) movie.id = values.getAsInteger(ID)
                 if (values.containsKey(POPULARITY)) movie.popularity = values.getAsFloat(POPULARITY)
@@ -128,7 +130,7 @@ data class Movie(
                 if (values.containsKey(DURATION)) movie.duration = values.getAsInteger(DURATION)
                 if (values.containsKey(ORI_LANGUAGE)) movie.originalLanguage = values.getAsString(ORI_LANGUAGE)
                 if (values.containsKey(ORI_TITLE)) movie.originalTitle = values.getAsString(ORI_TITLE)
-                if (values.containsKey(GENRES)) movie.genres = values.get(GENRES) as List<Genre>
+                if (values.containsKey(GENRES)) movie.genres = converter.getGenres(values.getAsString(GENRES))
                 if (values.containsKey(TITLE)) movie.title = values.getAsString(TITLE)
                 if (values.containsKey(STATUS)) movie.status = values.getAsString(STATUS)
                 if (values.containsKey(BUDGET)) movie.budget = values.getAsInteger(BUDGET)

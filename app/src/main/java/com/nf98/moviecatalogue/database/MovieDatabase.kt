@@ -29,9 +29,14 @@ abstract class MovieDatabase : RoomDatabase() {
                 ).build()
             }
 
-        val CONTENT_URI = Uri.Builder().scheme("content")
+        val CONTENT_MOVIE: Uri = Uri.Builder().scheme("content")
             .authority("com.nf98.moviecatalogue")
-            .appendPath("fav")
+            .appendPath("movie")
+            .build()
+
+        val CONTENT_TV: Uri = Uri.Builder().scheme("content")
+            .authority("com.nf98.moviecatalogue")
+            .appendPath("tv_show")
             .build()
     }
 }
